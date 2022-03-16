@@ -48,8 +48,8 @@
         const NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         const SCREEN = {
             FULL: {
-                height: window.innerHeight / 1.25,
-                width: window.innerWidth / 2
+                height: window.innerHeight,
+                width: window.innerWidth
             },
             AREA_GAME: {
                 height: 500,
@@ -57,7 +57,7 @@
             }
         }
 
-        const RATE_SCALE = 0.1;
+        const RATE_SCALE = 0.08;
         const SQUARE_SIZE = SCREEN.FULL.height * RATE_SCALE;
 
         const SUDOKU = {
@@ -77,8 +77,8 @@
 
         const initGame = () => {
             CANVAS = document.getElementById("canvas");
-            CANVAS.width = SCREEN.FULL.width;
-            CANVAS.height = SCREEN.FULL.height;
+            CANVAS.width = SUDOKU.gridSize + 10;
+            CANVAS.height = SUDOKU.gridSize + 10;
             CTX = CANVAS.getContext('2d');
             initMapBlock();
             initEmptyGrid();
@@ -90,8 +90,8 @@
 
         const initMapBlock = () => {
             let topLeftGrid = {
-                x: (SCREEN.FULL.width - SUDOKU.gridSize) / 2,
-                y: (SCREEN.FULL.height - SUDOKU.gridSize) / 2
+                x: 5,
+                y: 5
             };
 
             for (let i = 0; i < 10; i++) {
@@ -254,8 +254,8 @@
 
         const handleMouseMoveOn = (event) => {
             const pos = {
-                "x": event.clientX,
-                "y": event.clientY
+                "x": event.clientX - CANVAS.offsetLeft,
+                "y": event.clientY - CANVAS.offsetTop
             };
 
             let isInsideRect = isInsideSquare(pos, MAP_BLOCK[0][0].topLeft, SUDOKU.gridSize);
@@ -475,7 +475,7 @@
         <h3>Welcome to my sudoku</h3>
     </div>
 
-    <div class="container mt-1 border">
+    <div class="container mt-1">
         <div class="row">
             <div class="d-flex justify-content-between">
 
@@ -512,6 +512,13 @@
 
             </div>
         </div>
+    </div>
+
+    <div class="container mt-1 border">
+        <div class="col-8 mt-1 mr-1">
+            <Canvas onmousemove="handleMouseMoveOn(event)" id="canvas" />
+        </div>
+        <div class="col-4"></div>
     </div>
 </body>
 
