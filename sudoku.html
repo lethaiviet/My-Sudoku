@@ -94,6 +94,9 @@
             textSize: SQUARE_SIZE * 0.7,
             gridStrokeStyle: 'black',
             lineStrokeStyle: 'gray',
+            selectedBlockStyle: '#BBDEFB',
+            selectedBlockValueStyle: '#C3D7EA',
+            selectedRowAndColAndSubGridStyle: '#E2EBF3',
             backgroundFillStyle: 'white',
         }
 
@@ -272,12 +275,50 @@
             }
         }
 
-        const fillColorBlockByIdx = (idx) => {
-            drawEntireSudoku();
-            CTX.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        const fillColorBlockByIdx = (idx, fileStyle) => {
+            CTX.fillStyle = fileStyle;
             CTX.fillRect(MAP_BLOCK[idx.r][idx.c].topLeft.x,
                 MAP_BLOCK[idx.r][idx.c].topLeft.y,
                 SUDOKU.blockSize, SUDOKU.blockSize);
+        }
+
+        const fillColorBlockByValue = (idx) => {
+            let value = GRID[idx.r][idx.c]
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    if (value == 0 || value != GRID[r][c]) continue;
+                    fillColorBlockByIdx({ r: r, c: c }, SUDOKU.selectedBlockValueStyle);
+                }
+            }
+        }
+
+        const fillColorBlocksInRowAndColByIdx = (idx) => {
+            for (let i = 0; i < 9; i++) {
+                fillColorBlockByIdx({ r: idx.r, c: i }, SUDOKU.selectedRowAndColAndSubGridStyle);
+                fillColorBlockByIdx({ r: i, c: idx.c }, SUDOKU.selectedRowAndColAndSubGridStyle);
+            }
+        }
+
+        const fillColorBlocksInSubGridByIdx = (idx) => {
+            let y = Math.floor(idx.r / 3);
+            let x = Math.floor(idx.c / 3);
+            let arr = [];
+            for (let i = 0; i < 9; i++) {
+                let c = x * 3 + i % 3;
+                let r = y * 3 + Math.floor(i / 3);
+                fillColorBlockByIdx({ r: r, c: c }, SUDOKU.selectedRowAndColAndSubGridStyle);
+            }
+            return arr;
+        }
+
+        const fillColorAfterClickingAt = (idx) => {
+            clearEntireSudoku();
+            fillColorBlocksInRowAndColByIdx(idx);
+            fillColorBlocksInSubGridByIdx(idx);
+            fillColorBlockByValue(idx);
+            fillColorBlockByIdx(idx, SUDOKU.selectedBlockStyle);
+            drawGridSudoku();
+            drawNumberIntoGrid();
         }
 
         const handleMouseMoveOn = (event) => {
@@ -293,6 +334,9 @@
             console.log(findIdxBlockByPos(pos));
 
             fillColorBlockByIdx(findIdxBlockByPos(pos));
+            let idx = findIdxBlockByPos(pos);
+
+            fillColorAfterClickingAt(idx);
         }
 
         const getRandomValues = () => {
