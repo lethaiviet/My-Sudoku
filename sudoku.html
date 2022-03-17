@@ -11,14 +11,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        .btn {
+        /* .btn {
             background-color: DodgerBlue;
             border: none;
             color: white;
             padding: 12px 16px;
             font-size: 16px;
             cursor: pointer;
-        }
+        } */
 
         .form-select:focus {
             outline: none;
@@ -26,9 +26,9 @@
         }
 
         /* Darker background on mouse-over */
-        .btn:hover {
+        /* .btn:hover {
             background-color: RoyalBlue;
-        }
+        } */
 
         .btn-circle.btn-sm {
             width: 30px;
@@ -37,6 +37,34 @@
             border-radius: 15px;
             font-size: 8px;
             text-align: center;
+        }
+
+        .btn-circle.btn-md {
+            width: 50px;
+            height: 50px;
+            padding: 7px 10px;
+            border-radius: 25px;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .btn-circle.btn-xl {
+            width: 70px;
+            height: 70px;
+            padding: 10px 16px;
+            border-radius: 35px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .btn-square-md {
+            width: 80px !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            height: 80px !important;
+            text-align: center;
+            padding: 0px;
+            font-size: 10px;
         }
     </style>
     <script>
@@ -57,7 +85,7 @@
             }
         }
 
-        const RATE_SCALE = 0.08;
+        const RATE_SCALE = 0.085;
         const SQUARE_SIZE = SCREEN.FULL.height * RATE_SCALE;
 
         const SUDOKU = {
@@ -515,10 +543,80 @@
     </div>
 
     <div class="container mt-1 border">
-        <div class="col-8 mt-1 mr-1">
-            <Canvas onmousemove="handleMouseMoveOn(event)" id="canvas" />
+        <div class="row">
+            <div class="col-6 mt-1 border">
+                <Canvas class="mx-6" onmousemove="handleMouseMoveOn(event)" id="canvas" />
+            </div>
+
+            <div class="col-4">
+                <div class="col-10 mt-1 border">
+                    <div class="row">
+                        <button type="button" class="btn btn-primary btn-lg  btn-block">New Game</button>
+                    </div>
+
+                    <div class="row mt-1">
+                        <div class="col-3">
+                            <button class="btn btn-circle btn-md btn-outline-primary">
+                                <i class="fa fa-undo fa-3x"></i>
+                            </button>
+                            <p class="text-center">Undo</p>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-circle btn-md btn-outline-primary">
+                                <i class="fa fa-eraser fa-3x"></i>
+                            </button>
+                            <p class="text-center">Eraser</p>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-lg btn-circle btn-md btn-outline-primary">
+                                <i class="fa fa-pencil fa-3x"></i>
+                            </button>
+                            <p class="text-center">Pencil</p>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-circle btn-md btn-outline-primary">
+                                <i class="fa fa-lightbulb-o fa-3x"></i>
+                            </button>
+                            <p class="text-center">Hint</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">1</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">2</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">3</button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">4</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">5</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">6</button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">7</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">8</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-square-md fs-1">9</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-4"></div>
     </div>
 </body>
 
