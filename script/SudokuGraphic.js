@@ -6,15 +6,20 @@ import Utils from "./Utils.js";
 export default class SudokuGraphic {
     static BLOCK_SIZE = CONST.SQUARE_SIZE;
     static GRID_SIZE = Sudoku.SIZE * SudokuGraphic.BLOCK_SIZE;
+    static TEXT_SIZE = SudokuGraphic.BLOCK_SIZE * 0.7;
     static PADDING = 10;
+
     static STYLE = {
         thinLine: 'gray',
         thickLine: 'black',
-        backGround: 'white'
+        backGround: 'white',
+        numbText: 'black',
+        numbTextFont: `${SudokuGraphic.TEXT_SIZE}px Arial`,
     };
 
-    constructor(canvas) {
+    constructor(canvas, sudoku) {
         this.canvas = canvas;
+        this.sudoku = sudoku;
         this.autoResizeCanvas();
         this.ctx = this.canvas.getContext('2d');
 
@@ -88,6 +93,32 @@ export default class SudokuGraphic {
             this.ctx.lineTo(this.MAP_BLOCK[9][i].topLeft.x, this.MAP_BLOCK[9][i].topLeft.y);
             this.ctx.stroke();
         }
+    }
+
+    drawNumberIntoGrid() {
+        for (let r = 0; r < Sudoku.SIZE; r++) {
+            for (let c = 0; c < Sudoku.SIZE; c++) {
+                this.drawNumberAtIdxBlock(r, c);
+                console.count();
+            }
+        }
+    }
+
+    drawNumberAtIdxBlock(r, c) {
+        this.drawNumberAt(this.sudoku.GRID[r][c], this.MAP_BLOCK[r][c].center);
+    }
+
+    drawNumberAt(num, center) {
+        if (num == 0) return;
+
+        this.ctx.fillStyle = SudokuGraphic.STYLE.numbText;
+        this.ctx.font = SudokuGraphic.STYLE.numbTextFont;
+
+        const wText = this.ctx.measureText(num).width;
+        const hText = this.ctx.measureText('M').width;
+
+        this.ctx.fillText(num, center.x - wText / 2, center.y + hText / 2, wText);
+        this.ctx.stroke();
     }
 
     setThinLineStyle() {

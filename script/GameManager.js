@@ -3,12 +3,14 @@ import { CONST } from "./GlobalVariable.js"
 import SudokuGraphic from "./SudokuGraphic.js";
 
 const initGame = () => {
-    var CANVAS = document.getElementById("canvas");
-    var sudokuGraphic = new SudokuGraphic(CANVAS);
+    const CANVAS = document.getElementById("canvas");
+    const sudoku = new Sudoku();
+    const sudokuGraphic = new SudokuGraphic(CANVAS, sudoku);
     sudokuGraphic.clearEntireSudoku();
+    sudokuGraphic.drawNumberIntoGrid();
     sudokuGraphic.drawGridSudoku();
 
-    var sudoku = new Sudoku();
+
     console.table(sudoku.GRID)
 }
 
