@@ -10,6 +10,7 @@
     <!-- Add icon library -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://npmcdn.com/@reactivex/rxjs@5.0.0-rc.1/dist/global/Rx.js"></script>
     <style>
         /* .btn {
             background-color: DodgerBlue;
@@ -72,6 +73,12 @@
         var CTX;
         var GRID = [];
         var COUNT = 0;
+        var MAP_IDX_COLOR = {};
+        var LIST_IDX_TRAVELED = [];
+        var IDX_SELECTED_BORDER;
+        var INTERVAL = 0;
+        var myInterVal;
+        const COLORS_LIST = ["#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA"];
 
         const NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         const SCREEN = {
@@ -275,8 +282,8 @@
             }
         }
 
-        const fillColorBlockByIdx = (idx, fileStyle) => {
-            CTX.fillStyle = fileStyle;
+        const fillColorBlockByIdx = (idx, fillStyle) => {
+            CTX.fillStyle = fillStyle;
             CTX.fillRect(MAP_BLOCK[idx.r][idx.c].topLeft.x,
                 MAP_BLOCK[idx.r][idx.c].topLeft.y,
                 SUDOKU.blockSize, SUDOKU.blockSize);
@@ -330,13 +337,32 @@
             let isInsideRect = isInsideSquare(pos, MAP_BLOCK[0][0].topLeft, SUDOKU.gridSize);
 
             if (!isInsideRect) return;
-            console.log(pos);
-            console.log(findIdxBlockByPos(pos));
 
             fillColorBlockByIdx(findIdxBlockByPos(pos));
             let idx = findIdxBlockByPos(pos);
 
             fillColorAfterClickingAt(idx);
+        }
+
+        const handleMouseDown = (event) => {
+            const pos = {
+                "x": event.clientX - CANVAS.offsetLeft,
+                "y": event.clientY - CANVAS.offsetTop
+            };
+
+            let isInsideRect = isInsideSquare(pos, MAP_BLOCK[0][0].topLeft, SUDOKU.gridSize);
+
+            if (!isInsideRect) return;
+
+            fillColorBlockByIdx(findIdxBlockByPos(pos));
+            let idx = findIdxBlockByPos(pos);
+            IDX_SELECTED_BORDER = idx;
+
+            MAP_IDX_COLOR[[idx.r, idx.c]] = COLORS_LIST.length - 1;
+            LIST_IDX_TRAVELED = [];
+            LIST_IDX_TRAVELED.push([[idx.r, idx.c]].toString());
+            console.countReset(INTERVAL);
+            myInterVal = setInterval(animationFinishColOrRowOrSquareSudoku, 100);
         }
 
         const getRandomValues = () => {
@@ -443,15 +469,12 @@
                 if (GRID[row][col] == 0) continue;
                 let backup = GRID[row][col];
 
-                //console.log(`GRID[${row}][${col}]`);
                 GRID[row][col] = 0;
 
                 let gridCopy = clone(GRID);
 
                 COUNT = 0;
                 solveSudoku(gridCopy);
-
-                //console.count(COUNT);
 
                 if (COUNT != 1) {
                     GRID[row][col] = backup;
@@ -469,10 +492,6 @@
             }
             return false;
         }
-
-        // const getSubGridAt = (x, y) => {
-        //     return
-        // }
 
         const getSubGridAt = (x, y, grid = GRID) => {
             let arr = [];
@@ -533,11 +552,75 @@
             return Math.floor(Math.random() * (max - min + 1) + min)
         }
 
+        const getListNeighborsIdxAt = (idx) => {
+
+            let directions = [[1, 0], [0, -1], [-1, 0], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1], [0, 1]];
+            let list = [];
+            for (const direction of directions) {
+                let neighbor = [idx.r + direction[0], idx.c + direction[1]];
+
+                if (neighbor[0] < 0 || neighbor[1] < 0 || neighbor[0] >= 9 || neighbor[1] >= 9) continue;
+                list.push(neighbor);
+            }
+            return list;
+        }
+
+        const convertStrToIdx = (str) => {
+            let arr = str.split(",");
+            return { r: parseInt(arr[0]), c: parseInt(arr[1]) };
+        }
+
+        
+        const animationFinishColOrRowOrSquareSudoku = () => {
+            INTERVAL++;
+            console.count(INTERVAL);
+            clearEntireSudoku();
+            fillColorBlocksInRowAndColByIdx(IDX_SELECTED_BORDER);
+            fillColorBlocksInSubGridByIdx(IDX_SELECTED_BORDER);
+            fillColorBlockByValue(IDX_SELECTED_BORDER);
+            fillColorBlockByIdx(IDX_SELECTED_BORDER, SUDOKU.selectedBlockStyle);
+
+            if (INTERVAL > 50 || Object.keys(MAP_IDX_COLOR).length == 0) {
+                clearInterval(myInterVal);
+                LIST_IDX_TRAVELED = [];
+                INTERVAL = 0;
+            } else {
+                for (const [idx, idxColor] of Object.entries(MAP_IDX_COLOR)) {
+                    let idxObj = convertStrToIdx(idx);
+
+                    if (MAP_IDX_COLOR[idx] <= 0 ||
+                        (idxObj.r != IDX_SELECTED_BORDER.r &&
+                            idxObj.c != IDX_SELECTED_BORDER.c)) {
+                        delete MAP_IDX_COLOR[idx];
+                        continue;
+                    }
+
+
+                    fillColorBlockByIdx(idxObj, COLORS_LIST[idxColor]);
+                    MAP_IDX_COLOR[idx] = idxColor - 1;
+
+                    let neighbors = getListNeighborsIdxAt(idxObj);
+                    for (const neighbor of neighbors) {
+                        if (LIST_IDX_TRAVELED.includes(neighbor.toString())) continue;
+                        LIST_IDX_TRAVELED.push(neighbor.toString());
+                        MAP_IDX_COLOR[neighbor] = idxColor + 1;
+                    }
+                    // console.table(MAP_IDX_COLOR)
+                }
+            }
+
+            drawGridSudoku();
+            drawNumberIntoGrid();
+        }
+
+
         window.onload = (event) => {
             console.log('Run func initGame()');
             initGame();
             console.log('isGridSudokuValid() = ' + isGridSudokuValid());
-
+            // MAP_IDX_COLOR[[4, 4]] = COLORS_LIST.length - 1;
+            // LIST_IDX_TRAVELED.push([4, 4].toString());
+            // myInterVal = setInterval(animationFinishColOrRowOrSquareSudoku, 200);
         };
     </script>
 </head>
@@ -593,7 +676,8 @@
             <div class="col-9">
                 <div class="d-flex justify-content-between">
                     <div class="mt-1 justify-content-start">
-                        <Canvas class="mx-6" onmousemove="handleMouseMoveOn(event)" id="canvas" />
+                        <!-- onmousemove="handleMouseMoveOn(event)" -->
+                        <Canvas class="mx-6" onmousedown="handleMouseDown(event)" id="canvas" />
                     </div>
 
                     <div class="col-5 justify-content-end">
