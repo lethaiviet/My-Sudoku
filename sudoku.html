@@ -6,68 +6,11 @@
     <title>My sudoku</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Add icon library -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://npmcdn.com/@reactivex/rxjs@5.0.0-rc.1/dist/global/Rx.js"></script>
-    <style>
-        /* .btn {
-            background-color: DodgerBlue;
-            border: none;
-            color: white;
-            padding: 12px 16px;
-            font-size: 16px;
-            cursor: pointer;
-        } */
-
-        .form-select:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
-        /* Darker background on mouse-over */
-        /* .btn:hover {
-            background-color: RoyalBlue;
-        } */
-
-        .btn-circle.btn-sm {
-            width: 30px;
-            height: 30px;
-            padding: 6px 0px;
-            border-radius: 15px;
-            font-size: 8px;
-            text-align: center;
-        }
-
-        .btn-circle.btn-md {
-            width: 50px;
-            height: 50px;
-            padding: 7px 10px;
-            border-radius: 25px;
-            font-size: 10px;
-            text-align: center;
-        }
-
-        .btn-circle.btn-xl {
-            width: 70px;
-            height: 70px;
-            padding: 10px 16px;
-            border-radius: 35px;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        .btn-square-md {
-            width: 100px !important;
-            max-width: 100% !important;
-            max-height: 100% !important;
-            height: 80px !important;
-            text-align: center;
-            padding: 0px;
-            font-size: 10px;
-        }
-    </style>
     <script>
         var CANVAS;
         var CTX;
@@ -294,15 +237,24 @@
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     if (value == 0 || value != GRID[r][c]) continue;
-                    fillColorBlockByIdx({ r: r, c: c }, SUDOKU.selectedBlockValueStyle);
+                    fillColorBlockByIdx({
+                        r: r,
+                        c: c
+                    }, SUDOKU.selectedBlockValueStyle);
                 }
             }
         }
 
         const fillColorBlocksInRowAndColByIdx = (idx) => {
             for (let i = 0; i < 9; i++) {
-                fillColorBlockByIdx({ r: idx.r, c: i }, SUDOKU.selectedRowAndColAndSubGridStyle);
-                fillColorBlockByIdx({ r: i, c: idx.c }, SUDOKU.selectedRowAndColAndSubGridStyle);
+                fillColorBlockByIdx({
+                    r: idx.r,
+                    c: i
+                }, SUDOKU.selectedRowAndColAndSubGridStyle);
+                fillColorBlockByIdx({
+                    r: i,
+                    c: idx.c
+                }, SUDOKU.selectedRowAndColAndSubGridStyle);
             }
         }
 
@@ -313,7 +265,10 @@
             for (let i = 0; i < 9; i++) {
                 let c = x * 3 + i % 3;
                 let r = y * 3 + Math.floor(i / 3);
-                fillColorBlockByIdx({ r: r, c: c }, SUDOKU.selectedRowAndColAndSubGridStyle);
+                fillColorBlockByIdx({
+                    r: r,
+                    c: c
+                }, SUDOKU.selectedRowAndColAndSubGridStyle);
             }
             return arr;
         }
@@ -360,7 +315,9 @@
 
             MAP_IDX_COLOR[[idx.r, idx.c]] = COLORS_LIST.length - 1;
             LIST_IDX_TRAVELED = [];
-            LIST_IDX_TRAVELED.push([[idx.r, idx.c]].toString());
+            LIST_IDX_TRAVELED.push([
+                [idx.r, idx.c]
+            ].toString());
             console.countReset(INTERVAL);
             myInterVal = setInterval(animationFinishColOrRowOrSquareSudoku, 100);
         }
@@ -448,8 +405,7 @@
                     if (isFullGrid(grid)) {
                         COUNT++;
                         break;
-                    }
-                    else {
+                    } else {
                         if (solveSudoku(grid))
                             return true;
                     }
@@ -554,7 +510,17 @@
 
         const getListNeighborsIdxAt = (idx) => {
 
-            let directions = [[1, 0], [0, -1], [-1, 0], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1], [0, 1]];
+            let directions = [
+                [1, 0],
+                [0, -1],
+                [-1, 0],
+                [0, -1],
+                [1, 1],
+                [-1, -1],
+                [-1, 1],
+                [1, -1],
+                [0, 1]
+            ];
             let list = [];
             for (const direction of directions) {
                 let neighbor = [idx.r + direction[0], idx.c + direction[1]];
@@ -567,10 +533,13 @@
 
         const convertStrToIdx = (str) => {
             let arr = str.split(",");
-            return { r: parseInt(arr[0]), c: parseInt(arr[1]) };
+            return {
+                r: parseInt(arr[0]),
+                c: parseInt(arr[1])
+            };
         }
 
-        
+
         const animationFinishColOrRowOrSquareSudoku = () => {
             INTERVAL++;
             console.count(INTERVAL);
