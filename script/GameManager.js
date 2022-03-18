@@ -7,6 +7,9 @@ const initGame = () => {
     var sudokuGraphic = new SudokuGraphic(CANVAS);
     sudokuGraphic.clearEntireSudoku();
     sudokuGraphic.drawGridSudoku();
+
+    var sudoku = new Sudoku();
+    console.table(sudoku.GRID)
 }
 
 

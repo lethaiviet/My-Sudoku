@@ -5,11 +5,12 @@ import Utils from "./Utils.js";
 
 export default class SudokuGraphic {
     static BLOCK_SIZE = CONST.SQUARE_SIZE;
-    static GRID_SIZE = Sudoku.NUMB_ROW * SudokuGraphic.BLOCK_SIZE;
+    static GRID_SIZE = Sudoku.SIZE * SudokuGraphic.BLOCK_SIZE;
     static PADDING = 10;
     static STYLE = {
         thinLine: 'gray',
-        thickLine: 'black'
+        thickLine: 'black',
+        backGround: 'white'
     };
 
     constructor(canvas) {
@@ -30,7 +31,7 @@ export default class SudokuGraphic {
 
     initMapBlock() {
         const topLeftGrid = { x: SudokuGraphic.PADDING / 2, y: SudokuGraphic.PADDING / 2 };
-        const N = Sudoku.NUMB_ROW + 1;
+        const N = Sudoku.SIZE + 1;
         const distance = SudokuGraphic.BLOCK_SIZE;
 
         for (let r = 0; r < N; r++) {
@@ -67,12 +68,12 @@ export default class SudokuGraphic {
     }
 
     drawBackGround() {
-        this.ctx.fillStyle = 'yellow';
+        this.ctx.fillStyle = SudokuGraphic.STYLE.backGround;
         this.ctx.fillRect(0, 0, CONST.FULL_SCREEN.w, CONST.FULL_SCREEN.h);
     }
 
     drawGridSudoku() {
-        const N = Sudoku.NUMB_ROW + 1;
+        const N = Sudoku.SIZE + 1;
 
         for (let i = 0; i < N; i++) {
             this.ctx.beginPath();
