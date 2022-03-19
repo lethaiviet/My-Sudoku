@@ -32,7 +32,7 @@ window.onload = () => {
         document.getElementById("splash-screen").style.display = style;
     }
 
-    console("WebFont");
+    console.log("WebFont");
     WebFont.load({
         google: {
             families: ['Inter']
