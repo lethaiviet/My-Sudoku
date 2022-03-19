@@ -23,4 +23,15 @@ export default class Utils {
         }
         return false;
     }
+
+    static isInsideRect(pos, topLeft, width, height) {
+        return pos.x >= topLeft.x &&
+            pos.x <= topLeft.x + width &&
+            pos.y >= topLeft.y &&
+            pos.y <= topLeft.y + height;
+    }
+
+    static isInsideSquare(pos, topLeft, size) {
+        return Utils.isInsideRect(pos, topLeft, size, size);
+    }
 }

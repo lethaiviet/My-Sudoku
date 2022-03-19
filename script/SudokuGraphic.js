@@ -13,8 +13,11 @@ export default class SudokuGraphic {
         thinLine: 'gray',
         thickLine: 'black',
         backGround: 'white',
-        numbText: 'black',
-        numbTextFont: `${SudokuGraphic.TEXT_SIZE}px Arial`,
+        numbText: '#3C5068',
+        selectedArea: '#E2EBF3',
+        selectedBlock: '#BBDEFB',
+        selectedBlockValue: '#C3D7EA',
+        numbTextFont: `200 ${SudokuGraphic.TEXT_SIZE}px Inter`,
     };
 
     constructor(canvas, sudoku) {
@@ -48,7 +51,7 @@ export default class SudokuGraphic {
                 };
 
                 let topRight = Utils.getPosByDirection(topLeft, Direction.RIGHT, distance);
-                let bottomLeft = Utils.getPosByDirection(topLeft, Direction.DOWN_LEFT, distance);
+                let bottomLeft = Utils.getPosByDirection(topLeft, Direction.DOWN, distance);
                 let bottomRight = Utils.getPosByDirection(topLeft, Direction.DOWN_RIGHT, distance);
                 let center = Utils.getPosByDirection(topLeft, Direction.DOWN_RIGHT, distance * 0.5);
 
@@ -99,7 +102,6 @@ export default class SudokuGraphic {
         for (let r = 0; r < Sudoku.SIZE; r++) {
             for (let c = 0; c < Sudoku.SIZE; c++) {
                 this.drawNumberAtIdxBlock(r, c);
-                console.count();
             }
         }
     }
@@ -110,7 +112,7 @@ export default class SudokuGraphic {
 
     drawNumberAt(num, center) {
         if (num == 0) return;
-
+        this.ctx.lineWidth = 1;
         this.ctx.fillStyle = SudokuGraphic.STYLE.numbText;
         this.ctx.font = SudokuGraphic.STYLE.numbTextFont;
 
@@ -119,6 +121,92 @@ export default class SudokuGraphic {
 
         this.ctx.fillText(num, center.x - wText / 2, center.y + hText / 2, wText);
         this.ctx.stroke();
+    }
+
+    fillColorSelectedAreaByIdx(idx) {
+        this.clearEntireSudoku();
+        this.fillColorBlocksInRowAndColByIdx(idx);
+        this.fillColorBlocksInSubGridByIdx(idx);
+        this.fillColorBlockByValue(idx);
+        this.fillColorBlockByIdx(idx, SudokuGraphic.STYLE.selectedBlock);
+        this.drawGridSudoku();
+        this.drawNumberIntoGrid();
+    }
+
+    fillColorSelectedAreaByPosition(pos) {
+        if (!this.isInsideGrid(pos)) return;
+        const idx = this.findIdxBlockByPos(pos);
+        this.fillColorSelectedAreaByIdx(idx);
+    }
+
+    fillColorBlockByIdx(idx, fillStyle) {
+        this.ctx.fillStyle = fillStyle;
+        this.ctx.fillRect(
+            this.MAP_BLOCK[idx.r][idx.c].topLeft.x,
+            this.MAP_BLOCK[idx.r][idx.c].topLeft.y,
+            SudokuGraphic.BLOCK_SIZE,
+            SudokuGraphic.BLOCK_SIZE
+        );
+    }
+
+    fillColorBlocksInRowAndColByIdx(idx) {
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            this.fillColorBlockByIdx({ r: idx.r, c: i }, SudokuGraphic.STYLE.selectedArea);
+            this.fillColorBlockByIdx({ r: i, c: idx.c }, SudokuGraphic.STYLE.selectedArea);
+        }
+    }
+
+    fillColorBlocksInSubGridByIdx(idx) {
+        let n = Sudoku.SUB_GRID_SIZE;
+        let y = Math.floor(idx.r / n);
+        let x = Math.floor(idx.c / n);
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            let c = x * n + i % n;
+            let r = y * n + Math.floor(i / n);
+            this.fillColorBlockByIdx({ r: r, c: c }, SudokuGraphic.STYLE.selectedArea);
+        }
+    }
+
+    fillColorBlockByValue(idx) {
+        let value = this.sudoku.GRID[idx.r][idx.c];
+        for (let r = 0; r < Sudoku.SIZE; r++) {
+            for (let c = 0; c < Sudoku.SIZE; c++) {
+                if (value == 0 || value != this.sudoku.GRID[r][c]) continue;
+                this.fillColorBlockByIdx({ r: r, c: c }, SudokuGraphic.STYLE.selectedBlockValue);
+            }
+        }
+    }
+
+    isInsideGrid(pos) {
+        return Utils.isInsideSquare(pos, this.MAP_BLOCK[0][0].topLeft, SudokuGraphic.GRID_SIZE);
+    }
+
+
+    findColIdxBlockByPos(pos) {
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            if (pos.x > this.MAP_BLOCK[0][i].topLeft.x &&
+                pos.x < this.MAP_BLOCK[0][i].topRight.x) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    findRowIdxBlockByPos(pos) {
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            if (pos.y > this.MAP_BLOCK[i][0].topLeft.y &&
+                pos.y < this.MAP_BLOCK[i][0].bottomLeft.y) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    findIdxBlockByPos(pos) {
+        return {
+            c: this.findColIdxBlockByPos(pos),
+            r: this.findRowIdxBlockByPos(pos)
+        };
     }
 
     setThinLineStyle() {

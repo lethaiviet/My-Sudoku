@@ -2,19 +2,36 @@ import Sudoku from "./Sudoku.js"
 import { CONST } from "./GlobalVariable.js"
 import SudokuGraphic from "./SudokuGraphic.js";
 
-const initGame = () => {
-    const CANVAS = document.getElementById("canvas");
-    const sudoku = new Sudoku();
-    const sudokuGraphic = new SudokuGraphic(CANVAS, sudoku);
-    sudokuGraphic.clearEntireSudoku();
-    sudokuGraphic.drawNumberIntoGrid();
-    sudokuGraphic.drawGridSudoku();
-
-
-    console.table(sudoku.GRID)
-}
-
-
 window.onload = () => {
+    var CANVAS, SUDOKU, SUDOKU_GRAPHIC;
+    const initGame = () => {
+        CANVAS = document.getElementById("canvas");
+        SUDOKU = new Sudoku();
+        SUDOKU_GRAPHIC = new SudokuGraphic(CANVAS, SUDOKU);
+        SUDOKU_GRAPHIC.clearEntireSudoku();
+        SUDOKU_GRAPHIC.drawGridSudoku();
+        SUDOKU_GRAPHIC.drawNumberIntoGrid();
+
+        let mouseClick = Rx.Observable.fromEvent(CANVAS, 'click');
+        let subscriber1 = mouseClick.subscribe((e) => handleMouseMoveOn(e));
+    }
+
+    const handleMouseMoveOn = (event) => {
+        const pos = {
+            "x": event.clientX - CANVAS.offsetLeft,
+            "y": event.clientY - CANVAS.offsetTop
+        };
+        SUDOKU_GRAPHIC.fillColorSelectedAreaByPosition(pos);
+    }
+
     initGame();
+    WebFont.load({
+        google: {
+            families: ['Inter']
+        },
+        active: () => {
+            SUDOKU_GRAPHIC.fillColorSelectedAreaByIdx({ r: 4, c: 4 });
+        }
+    });
+
 }

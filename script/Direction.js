@@ -5,9 +5,9 @@ export default class Direction {
     static RIGHT = new Direction([1, 0]);
     static LEFT = new Direction([-1, 0]);
     static UP_RIGHT = new Direction([1, -1]);
-    static UP_LEFT = new Direction([-1, 1]);
+    static UP_LEFT = new Direction([-1, -1]);
     static DOWN_RIGHT = new Direction([1, 1]);
-    static DOWN_LEFT = new Direction([-1, -1]);
+    static DOWN_LEFT = new Direction([-1, 1]);
 
     constructor(vector) {
         this.vector = vector
