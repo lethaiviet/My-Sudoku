@@ -17,7 +17,7 @@ export default class SudokuGraphic {
         selectedArea: '#E2EBF3',
         selectedBlock: '#BBDEFB',
         selectedBlockValue: '#C3D7EA',
-        numbTextFont: `200 ${SudokuGraphic.TEXT_SIZE}px Inter`,
+        numbTextFont: `300 ${SudokuGraphic.TEXT_SIZE}px Inter`,
     };
 
     constructor(canvas, sudoku) {

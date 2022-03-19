@@ -1,5 +1,4 @@
 import Sudoku from "./Sudoku.js"
-import { CONST } from "./GlobalVariable.js"
 import SudokuGraphic from "./SudokuGraphic.js";
 
 window.onload = () => {
@@ -24,13 +23,13 @@ window.onload = () => {
         SUDOKU_GRAPHIC.fillColorSelectedAreaByPosition(pos);
     }
 
-    initGame();
+
     WebFont.load({
         google: {
             families: ['Inter']
         },
         active: () => {
-            SUDOKU_GRAPHIC.fillColorSelectedAreaByIdx({ r: 4, c: 4 });
+            initGame();
         }
     });
 
