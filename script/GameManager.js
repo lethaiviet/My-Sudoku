@@ -27,6 +27,7 @@ window.onload = () => {
     }
 
     const showLoading = (isEnabled) => {
+        const style = isEnabled ? 'block' : 'none';
         document.getElementById("splash-screen").style.display = style;
     }
 
@@ -39,7 +40,7 @@ window.onload = () => {
                 showLoading(value);
             });
 
-            initGame$.subscribe((value) => {
+            initGame$.subscribe(() => {
                 initGame()
                 loading$.next(false);
             });
