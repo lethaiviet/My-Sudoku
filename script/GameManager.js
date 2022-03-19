@@ -28,6 +28,7 @@ window.onload = () => {
 
     const showLoading = (isEnabled) => {
         const style = isEnabled ? 'block' : 'none';
+        console.count(showLoading);
         document.getElementById("splash-screen").style.display = style;
     }
 
