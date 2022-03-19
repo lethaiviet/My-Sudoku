@@ -3,6 +3,9 @@ import SudokuGraphic from "./SudokuGraphic.js";
 
 window.onload = () => {
     var CANVAS, SUDOKU, SUDOKU_GRAPHIC;
+    const loading$ = new Rx.BehaviorSubject(true);
+    const initGame$ = new Rx.BehaviorSubject(false);
+
     const initGame = () => {
         CANVAS = document.getElementById("canvas");
         SUDOKU = new Sudoku();
@@ -23,13 +26,23 @@ window.onload = () => {
         SUDOKU_GRAPHIC.fillColorSelectedAreaByPosition(pos);
     }
 
+    const showLoading = (isEnabled) => {
+        document.getElementById("splash-screen").style.display = style;
+    }
 
     WebFont.load({
         google: {
             families: ['Inter']
         },
         active: () => {
-            initGame();
+            loading$.subscribe((value) => {
+                showLoading(value);
+            });
+
+            initGame$.subscribe((value) => {
+                initGame()
+                loading$.next(false);
+            });
         }
     });
 
