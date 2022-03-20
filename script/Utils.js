@@ -1,4 +1,4 @@
-import { CONST } from "./GlobalVariable.js";
+import { CONST } from './GlobalVariable.js';
 
 export default class Utils {
     static getPosByDirection(startPos, direction, distance) {
@@ -15,6 +15,10 @@ export default class Utils {
             [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
         }
         return newArr
+    }
+
+    static randomIntFromInterval(min, max) { // min and max included 
+        return Math.floor(Math.random() * (max - min + 1) + min)
     }
 
     static checkValueExistAtCol(matrix, c, value) {
@@ -34,4 +38,8 @@ export default class Utils {
     static isInsideSquare(pos, topLeft, size) {
         return Utils.isInsideRect(pos, topLeft, size, size);
     }
+
+    static clone(items) {
+        return items.map(item => Array.isArray(item) ? Utils.clone(item) : item);
+    };
 }
