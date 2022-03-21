@@ -5,12 +5,10 @@ export default class Sudoku {
     static SIZE = 9;
     static SUB_GRID_SIZE = 3;
     static NUMB_SQUARES = this.SIZE * this.SIZE;
-    constructor() {
+    constructor(level) {
         this.COUNT = 0;
         this.GRID = [];
-        this.createZeroGrid();
-        this.fillRandomValueIntoGrid();
-        this.generateLevelSudoku();
+        this.generateLevelSudoku(level);
     }
 
     createZeroGrid() {
@@ -56,6 +54,9 @@ export default class Sudoku {
     }
 
     generateLevelSudoku(level = 1) {
+        this.createZeroGrid();
+        this.fillRandomValueIntoGrid();
+
         while (level > 0) {
             let col = Utils.randomIntFromInterval(0, 8);
             let row = Utils.randomIntFromInterval(0, 8);
