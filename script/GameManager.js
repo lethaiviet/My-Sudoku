@@ -27,15 +27,20 @@ window.onload = () => {
     const levelGame$ = new BehaviorSubject(1);
 
     const initGame = () => {
-        console.count("initGame");
         CANVAS = document.querySelector("#canvas");
         LEVEL = document.querySelector("#level-game");
         PLAY_PAUSE_BTN = document.querySelector("#play-pause-btn");
+        initAllEventsInGame();
+    }
 
+    const initAllEventsInGame = () => {
+        initClickOnGridSudokuEvent();
+        initShowLoadingEvent();
+        initSelectLevelEvent();
+        initWatchStopEvent();
+    }
 
-        const fromClickOnSudokuGrid$ = fromEvent(CANVAS, 'click');
-        fromClickOnSudokuGrid$.subscribe((e) => handleClickOnSudokuGrid(e));
-
+    const initWatchStopEvent = () => {
         const eventStopWatch$ = merge(
             fromClickToMap("play-pause-btn", {
                 typeEvent: "click-on-toggle"
@@ -55,7 +60,6 @@ window.onload = () => {
                 value: 0
             }),
             scan((state, curr) => {
-                console.table([state, curr])
                 state = {...state,
                     ...curr
                 };
@@ -77,7 +81,9 @@ window.onload = () => {
             ) : NEVER)
         );
         stopWatch$.subscribe();
+    }
 
+    const initSelectLevelEvent = () => {
         const selectLevel$ = fromEvent(LEVEL, 'change');
         selectLevel$.subscribe((e) => {
             isLoading$.next(true);
@@ -86,18 +92,24 @@ window.onload = () => {
             setTimeout(() => levelGame$.next(e.target.value), 50);
         });
 
-        isLoading$.subscribe((value) => {
-            showLoading(value);
-        });
-
         levelGame$.subscribe((level) => {
             initSudoku(level);
             isLoading$.next(false);
         });
     }
 
+    const initClickOnGridSudokuEvent = () => {
+        const fromClickOnSudokuGrid$ = fromEvent(CANVAS, 'click');
+        fromClickOnSudokuGrid$.subscribe((e) => handleClickOnSudokuGrid(e));
+    }
+
+    const initShowLoadingEvent = () => {
+        isLoading$.subscribe((value) => {
+            showLoading(value);
+        });
+    }
+
     const initSudoku = (level = 1) => {
-        console.count(`initSudoku ${level}`);
         SUDOKU = new Sudoku(level);
         SUDOKU_GRAPHIC = new SudokuGraphic(CANVAS, SUDOKU);
         SUDOKU_GRAPHIC.clearEntireSudoku();
@@ -119,8 +131,8 @@ window.onload = () => {
     }
 
     const fromClick = (id) => fromEvent(document.getElementById(id), 'click');
-    const fromClickToMap = (id, obj) => fromClick(id).pipe(mapTo(obj));
 
+    const fromClickToMap = (id, obj) => fromClick(id).pipe(mapTo(obj));
 
     const setValueWatchStop = (value) => {
         document.querySelector("#timer").innerHTML = Utils.formatSeconds(value);
