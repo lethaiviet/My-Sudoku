@@ -1,20 +1,84 @@
 import Sudoku from "./Sudoku.js"
 import SudokuGraphic from "./SudokuGraphic.js";
+import Utils from "./Utils.js";
+const {
+    BehaviorSubject,
+    fromEvent,
+    merge,
+    empty,
+    interval,
+    NEVER,
+    publish
+} = rxjs;
+
+const {
+    mapTo,
+    scan,
+    startWith,
+    switchMap,
+    tap
+} = rxjs.operators;
 
 window.onload = () => {
-    var CANVAS, SUDOKU, SUDOKU_GRAPHIC, LEVEL;
-    const isLoading$ = new Rx.BehaviorSubject(true);
-    const levelGame$ = new Rx.BehaviorSubject(1);
+    var CANVAS, LEVEL, PLAY_PAUSE_BTN;
+    var SUDOKU, SUDOKU_GRAPHIC;
+
+    const isLoading$ = new BehaviorSubject(true);
+    const levelGame$ = new BehaviorSubject(1);
 
     const initGame = () => {
         console.count("initGame");
         CANVAS = document.querySelector("#canvas");
         LEVEL = document.querySelector("#level-game");
+        PLAY_PAUSE_BTN = document.querySelector("#play-pause-btn");
 
-        const mouseClick$ = Rx.Observable.fromEvent(CANVAS, 'click');
-        mouseClick$.subscribe((e) => handleMouseMoveOn(e));
 
-        const selectLevel$ = Rx.Observable.fromEvent(LEVEL, 'change');
+        const fromClickOnSudokuGrid$ = fromEvent(CANVAS, 'click');
+        fromClickOnSudokuGrid$.subscribe((e) => handleClickOnSudokuGrid(e));
+
+        const eventStopWatch$ = merge(
+            fromClickToMap("play-pause-btn", {
+                typeEvent: "click-on-toggle"
+            }),
+
+            levelGame$.pipe(mapTo({
+                typeEvent: "select-dropdown",
+                count: true,
+                value: 0
+            }))
+        );
+
+        const stopWatch$ = eventStopWatch$.pipe(
+            startWith({
+                count: true,
+                speed: 1000,
+                value: 0
+            }),
+            scan((state, curr) => {
+                console.table([state, curr])
+                state = {...state,
+                    ...curr
+                };
+                if (state.typeEvent == "click-on-toggle") {
+                    state.count = !state.count;
+                } else {
+                    state.count = true;
+                }
+
+                return state;
+            }, {}),
+            tap(state => {
+                setIconPlayPauseBtn(state.count);
+                setValueWatchStop(state.value)
+            }),
+            switchMap(state => state.count ? interval(1000).pipe(
+                tap(() => state.value += 1),
+                tap(() => setValueWatchStop(state.value))
+            ) : NEVER)
+        );
+        stopWatch$.subscribe();
+
+        const selectLevel$ = fromEvent(LEVEL, 'change');
         selectLevel$.subscribe((e) => {
             isLoading$.next(true);
 
@@ -41,7 +105,7 @@ window.onload = () => {
         SUDOKU_GRAPHIC.drawNumberIntoGrid();
     }
 
-    const handleMouseMoveOn = (event) => {
+    const handleClickOnSudokuGrid = (event) => {
         const pos = {
             "x": event.clientX - CANVAS.offsetLeft,
             "y": event.clientY - CANVAS.offsetTop
@@ -52,6 +116,25 @@ window.onload = () => {
     const showLoading = (isEnabled) => {
         const style = isEnabled ? 'block' : 'none';
         document.getElementById("splash-screen").style.display = style;
+    }
+
+    const fromClick = (id) => fromEvent(document.getElementById(id), 'click');
+    const fromClickToMap = (id, obj) => fromClick(id).pipe(mapTo(obj));
+
+
+    const setValueWatchStop = (value) => {
+        document.querySelector("#timer").innerHTML = Utils.formatSeconds(value);
+    }
+
+    const setIconPlayPauseBtn = (isCounting) => {
+        const attribute = isCounting ? "fa fa-pause" : "fa fa-play";
+        PLAY_PAUSE_BTN.querySelector("i").setAttribute("class", attribute);
+    }
+
+    const isCounting = () => {
+        const typeBtn = PLAY_PAUSE_BTN.querySelector("i").className;
+        console.log(`isCounting: ${typeBtn == "fa fa-pause"}`)
+        return typeBtn == "fa fa-pause";
     }
 
     WebFont.load({

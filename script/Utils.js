@@ -1,4 +1,6 @@
-import { CONST } from './GlobalVariable.js';
+import {
+    CONST
+} from './GlobalVariable.js';
 
 export default class Utils {
     static getPosByDirection(startPos, direction, distance) {
@@ -42,4 +44,14 @@ export default class Utils {
     static clone(items) {
         return items.map(item => Array.isArray(item) ? Utils.clone(item) : item);
     };
+
+    static formatSeconds(secs) {
+        const pad = (n) => n < 10 ? `0${n}` : n;
+
+        // const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+
+        return `${pad(m)}:${pad(s)}`;
+    }
 }
