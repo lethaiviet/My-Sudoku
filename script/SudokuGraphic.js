@@ -10,10 +10,7 @@ export default class SudokuGraphic {
     static GRID_SIZE = Sudoku.SIZE * SudokuGraphic.BLOCK_SIZE;
     static TEXT_SIZE = SudokuGraphic.BLOCK_SIZE * 0.7;
     static PADDING = 10;
-    static SELECTED_BLOCK_ID = {
-        r: -1,
-        c: -1
-    };
+    static SELECTED_BLOCK_ID = Utils.creatIdxObj(-1, -1);
 
     static STYLE = {
         thinLine: 'gray',
@@ -213,24 +210,15 @@ export default class SudokuGraphic {
         for (let r = 0; r < Sudoku.SIZE; r++) {
             for (let c = 0; c < Sudoku.SIZE; c++) {
                 if (grid[r][c] == 0) continue;
-                this.fillColorBlockByIdx({
-                    r: r,
-                    c: c
-                }, 'red');
+                this.fillColorBlockByIdx(Utils.creatIdxObj(r, c), 'red');
             }
         }
     }
 
     fillColorBlocksInRowAndColByIdx(idx) {
         for (let i = 0; i < Sudoku.SIZE; i++) {
-            this.fillColorBlockByIdx({
-                r: idx.r,
-                c: i
-            }, SudokuGraphic.STYLE.selectedArea);
-            this.fillColorBlockByIdx({
-                r: i,
-                c: idx.c
-            }, SudokuGraphic.STYLE.selectedArea);
+            this.fillColorBlockByIdx(Utils.creatIdxObj(idx.r, i), SudokuGraphic.STYLE.selectedArea);
+            this.fillColorBlockByIdx(Utils.creatIdxObj(i, idx.c), SudokuGraphic.STYLE.selectedArea);
         }
     }
 
@@ -241,10 +229,7 @@ export default class SudokuGraphic {
         for (let i = 0; i < Sudoku.SIZE; i++) {
             let c = x * n + i % n;
             let r = y * n + Math.floor(i / n);
-            this.fillColorBlockByIdx({
-                r: r,
-                c: c
-            }, SudokuGraphic.STYLE.selectedArea);
+            this.fillColorBlockByIdx(Utils.creatIdxObj(r, c), SudokuGraphic.STYLE.selectedArea);
         }
     }
 
@@ -253,10 +238,7 @@ export default class SudokuGraphic {
         for (let r = 0; r < Sudoku.SIZE; r++) {
             for (let c = 0; c < Sudoku.SIZE; c++) {
                 if (value == 0 || value != this.sudoku.GRID[r][c]) continue;
-                this.fillColorBlockByIdx({
-                    r: r,
-                    c: c
-                }, SudokuGraphic.STYLE.selectedBlockValue);
+                this.fillColorBlockByIdx(Utils.creatIdxObj(r, c), SudokuGraphic.STYLE.selectedBlockValue);
             }
         }
     }
@@ -286,10 +268,10 @@ export default class SudokuGraphic {
     }
 
     findIdxBlockByPos(pos) {
-        return {
-            c: this.findColIdxBlockByPos(pos),
-            r: this.findRowIdxBlockByPos(pos)
-        };
+        return Utils.creatIdxObj(
+            this.findRowIdxBlockByPos(pos),
+            this.findColIdxBlockByPos(pos)
+        );
     }
 
     setThinLineStyle() {
