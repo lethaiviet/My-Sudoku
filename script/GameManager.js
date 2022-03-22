@@ -38,6 +38,7 @@ window.onload = () => {
         initShowLoadingEvent();
         initSelectLevelEvent();
         initWatchStopEvent();
+        initNewGameEvent();
         initNumPadsEvent();
     }
 
@@ -104,6 +105,17 @@ window.onload = () => {
         levelGame$.subscribe((level) => {
             initSudoku(level);
             isLoading$.next(false);
+        });
+    }
+
+    const initNewGameEvent = () => {
+        const clickEvent$ = fromClick("new-game-btn");
+        clickEvent$.subscribe(() => {
+            isLoading$.next(true);
+
+            //Set time out = 50ms to avoid initSudoku func block render/repair the splash screen. 
+            console.log("initNewGameEvent " + LEVEL.value)
+            setTimeout(() => levelGame$.next(LEVEL.value), 50);
         });
     }
 
