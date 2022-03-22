@@ -1,4 +1,6 @@
-import { CONST } from './GlobalVariable.js'
+import {
+    CONST
+} from './GlobalVariable.js'
 import Utils from './Utils.js';
 
 export default class Sudoku {
@@ -132,5 +134,11 @@ export default class Sudoku {
             arr[i] = grid[r][c];
         }
         return arr;
+    }
+
+    changeBlockValueByIdx(idx, value) {
+        console.table([idx, value, this.GRID])
+        if (idx.r < 0 || idx.c < 0) return;
+        this.GRID[idx.r][idx.c] = value;
     }
 }

@@ -38,6 +38,7 @@ window.onload = () => {
         initShowLoadingEvent();
         initSelectLevelEvent();
         initWatchStopEvent();
+        initNumPadsEvent();
     }
 
     const initWatchStopEvent = () => {
@@ -115,6 +116,46 @@ window.onload = () => {
         isLoading$.subscribe((value) => {
             showLoading(value);
         });
+    }
+
+    const initNumPadsEvent = () => {
+        const event$ = merge(
+            fromClickToMap("numpad-1", {
+                value: 1
+            }),
+            fromClickToMap("numpad-2", {
+                value: 2
+            }),
+            fromClickToMap("numpad-3", {
+                value: 3
+            }),
+            fromClickToMap("numpad-4", {
+                value: 4
+            }),
+            fromClickToMap("numpad-5", {
+                value: 5
+            }),
+            fromClickToMap("numpad-6", {
+                value: 6
+            }),
+            fromClickToMap("numpad-7", {
+                value: 7
+            }),
+            fromClickToMap("numpad-8", {
+                value: 8
+            }),
+            fromClickToMap("numpad-9", {
+                value: 9
+            }),
+        );
+
+        const numpad$ = event$.pipe(
+            throttleTime(200),
+            tap(state => console.table(state)),
+            tap((state) => SUDOKU_GRAPHIC.changeBlockValueAndDraw(state.value))
+        )
+
+        numpad$.subscribe();
     }
 
     const initSudoku = (level = 1) => {

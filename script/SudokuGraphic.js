@@ -10,6 +10,10 @@ export default class SudokuGraphic {
     static GRID_SIZE = Sudoku.SIZE * SudokuGraphic.BLOCK_SIZE;
     static TEXT_SIZE = SudokuGraphic.BLOCK_SIZE * 0.7;
     static PADDING = 10;
+    static SELECTED_BLOCK_ID = {
+        r: -1,
+        c: -1
+    };
 
     static STYLE = {
         thinLine: 'gray',
@@ -113,6 +117,11 @@ export default class SudokuGraphic {
         this.ctx.stroke();
         this.ctx.fillStyle = 'white';
         this.ctx.fill();
+
+        SudokuGraphic.SELECTED_BLOCK_ID = {
+            r: -1,
+            c: -1
+        };
     }
 
     drawPlayScreen() {
@@ -164,7 +173,13 @@ export default class SudokuGraphic {
         this.ctx.stroke();
     }
 
+    changeBlockValueAndDraw(value) {
+        this.sudoku.changeBlockValueByIdx(SudokuGraphic.SELECTED_BLOCK_ID, value);
+        this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
+    }
+
     fillColorSelectedAreaByIdx(idx) {
+        if (idx.r < 0 || idx.c < 0) return;
         this.clearEntireSudoku();
         this.fillColorBlocksInRowAndColByIdx(idx);
         this.fillColorBlocksInSubGridByIdx(idx);
@@ -177,6 +192,7 @@ export default class SudokuGraphic {
     fillColorSelectedAreaByPosition(pos) {
         if (!this.isInsideGrid(pos)) return;
         const idx = this.findIdxBlockByPos(pos);
+        SudokuGraphic.SELECTED_BLOCK_ID = idx;
         this.fillColorSelectedAreaByIdx(idx);
     }
 
@@ -233,7 +249,6 @@ export default class SudokuGraphic {
     isInsideGrid(pos) {
         return Utils.isInsideSquare(pos, this.MAP_BLOCK[0][0].topLeft, SudokuGraphic.GRID_SIZE);
     }
-
 
     findColIdxBlockByPos(pos) {
         for (let i = 0; i < Sudoku.SIZE; i++) {
