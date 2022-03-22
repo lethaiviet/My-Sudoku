@@ -19,7 +19,8 @@ export default class SudokuGraphic {
         thinLine: 'gray',
         thickLine: 'black',
         backGround: 'white',
-        numbText: '#3C5068',
+        numbTextColor: '#3C5068',
+        filledNumTextColor: '#0072E3',
         selectedArea: '#E2EBF3',
         selectedBlock: '#BBDEFB',
         selectedBlockValue: '#C3D7EA',
@@ -148,22 +149,22 @@ export default class SudokuGraphic {
         }
     }
 
-    drawNumberIntoGrid() {
+    drawNumberIntoGrid(grid = this.sudoku.GRID, txtColor = SudokuGraphic.STYLE.numbTextColor) {
         for (let r = 0; r < Sudoku.SIZE; r++) {
             for (let c = 0; c < Sudoku.SIZE; c++) {
-                this.drawNumberAtIdxBlock(r, c);
+                this.drawNumberAtIdxBlock(r, c, grid, txtColor);
             }
         }
     }
 
-    drawNumberAtIdxBlock(r, c) {
-        this.drawNumberAt(this.sudoku.GRID[r][c], this.MAP_BLOCK[r][c].center);
+    drawNumberAtIdxBlock(r, c, grid, txtColor) {
+        this.drawNumberAt(grid[r][c], this.MAP_BLOCK[r][c].center, txtColor);
     }
 
-    drawNumberAt(num, center) {
+    drawNumberAt(num, center, txtColor) {
         if (num == 0) return;
         this.ctx.lineWidth = 1;
-        this.ctx.fillStyle = SudokuGraphic.STYLE.numbText;
+        this.ctx.fillStyle = txtColor;
         this.ctx.font = SudokuGraphic.STYLE.numbTextFont;
 
         const wText = this.ctx.measureText(num).width;
@@ -187,6 +188,7 @@ export default class SudokuGraphic {
         this.fillColorBlockByIdx(idx, SudokuGraphic.STYLE.selectedBlock);
         this.drawGridSudoku();
         this.drawNumberIntoGrid();
+        this.drawNumberIntoGrid(this.sudoku.FILLED_GRID, SudokuGraphic.STYLE.filledNumTextColor);
     }
 
     fillColorSelectedAreaByPosition(pos) {

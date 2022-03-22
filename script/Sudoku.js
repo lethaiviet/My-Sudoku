@@ -10,12 +10,16 @@ export default class Sudoku {
     constructor(level) {
         this.COUNT = 0;
         this.GRID = [];
+        this.FILLED_GRID = [];
+        this.WRONG_GRID = [];
         this.generateLevelSudoku(level);
+        this.createZeroGrid(this.FILLED_GRID);
+        this.createZeroGrid(this.WRONG_GRID);
     }
 
-    createZeroGrid() {
+    createZeroGrid(grid = this.GRID) {
         for (let i = 0; i < Sudoku.SIZE; i++) {
-            this.GRID[i] = Array(Sudoku.SIZE).fill(0);
+            grid[i] = Array(Sudoku.SIZE).fill(0);
         }
     }
 
@@ -137,8 +141,7 @@ export default class Sudoku {
     }
 
     changeBlockValueByIdx(idx, value) {
-        console.table([idx, value, this.GRID])
-        if (idx.r < 0 || idx.c < 0) return;
-        this.GRID[idx.r][idx.c] = value;
+        if (idx.r < 0 || idx.c < 0 || this.GRID[idx.r][idx.c] != 0) return;
+        this.FILLED_GRID[idx.r][idx.c] = value;
     }
 }
