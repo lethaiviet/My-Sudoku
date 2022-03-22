@@ -1,5 +1,7 @@
 import Direction from "./Direction.js";
-import { CONST } from "./GlobalVariable.js"
+import {
+    CONST
+} from "./GlobalVariable.js"
 import Sudoku from "./Sudoku.js";
 import Utils from "./Utils.js";
 
@@ -38,7 +40,10 @@ export default class SudokuGraphic {
     }
 
     initMapBlock() {
-        const topLeftGrid = { x: SudokuGraphic.PADDING / 2, y: SudokuGraphic.PADDING / 2 };
+        const topLeftGrid = {
+            x: SudokuGraphic.PADDING / 2,
+            y: SudokuGraphic.PADDING / 2
+        };
         const N = Sudoku.SIZE + 1;
         const distance = SudokuGraphic.BLOCK_SIZE;
 
@@ -78,6 +83,42 @@ export default class SudokuGraphic {
     drawBackGround() {
         this.ctx.fillStyle = SudokuGraphic.STYLE.backGround;
         this.ctx.fillRect(0, 0, CONST.FULL_SCREEN.w, CONST.FULL_SCREEN.h);
+    }
+
+    drawPauseScreen() {
+        this.clearEntireSudoku();
+        this.drawGridSudoku();
+        const idx = Math.floor(Sudoku.SIZE / 2);
+        const r = SudokuGraphic.BLOCK_SIZE * 0.8;
+        const d = SudokuGraphic.BLOCK_SIZE * 0.2;
+        console.log(r)
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = '#0D6EFD';
+        this.ctx.arc(
+            this.MAP_BLOCK[idx][idx].center.x,
+            this.MAP_BLOCK[idx][idx].center.y,
+            r, 0, 2 * Math.PI
+        );
+        this.ctx.stroke();
+
+        this.ctx.fillStyle = '#0D6EFD';
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'white';
+        this.ctx.moveTo(this.MAP_BLOCK[idx][idx].topLeft.x + d, this.MAP_BLOCK[idx][idx].topLeft.y);
+        this.ctx.lineTo(this.MAP_BLOCK[idx][idx].bottomLeft.x + d, this.MAP_BLOCK[idx][idx].bottomLeft.y);
+        this.ctx.lineTo(this.MAP_BLOCK[idx][idx].topRight.x, this.MAP_BLOCK[idx][idx].center.y);
+        this.ctx.lineTo(this.MAP_BLOCK[idx][idx].topLeft.x + d, this.MAP_BLOCK[idx][idx].topLeft.y);
+        this.ctx.stroke();
+        this.ctx.fillStyle = 'white';
+        this.ctx.fill();
+    }
+
+    drawPlayScreen() {
+        this.clearEntireSudoku();
+        this.drawGridSudoku();
+        this.drawNumberIntoGrid();
     }
 
     drawGridSudoku() {
@@ -151,8 +192,14 @@ export default class SudokuGraphic {
 
     fillColorBlocksInRowAndColByIdx(idx) {
         for (let i = 0; i < Sudoku.SIZE; i++) {
-            this.fillColorBlockByIdx({ r: idx.r, c: i }, SudokuGraphic.STYLE.selectedArea);
-            this.fillColorBlockByIdx({ r: i, c: idx.c }, SudokuGraphic.STYLE.selectedArea);
+            this.fillColorBlockByIdx({
+                r: idx.r,
+                c: i
+            }, SudokuGraphic.STYLE.selectedArea);
+            this.fillColorBlockByIdx({
+                r: i,
+                c: idx.c
+            }, SudokuGraphic.STYLE.selectedArea);
         }
     }
 
@@ -163,7 +210,10 @@ export default class SudokuGraphic {
         for (let i = 0; i < Sudoku.SIZE; i++) {
             let c = x * n + i % n;
             let r = y * n + Math.floor(i / n);
-            this.fillColorBlockByIdx({ r: r, c: c }, SudokuGraphic.STYLE.selectedArea);
+            this.fillColorBlockByIdx({
+                r: r,
+                c: c
+            }, SudokuGraphic.STYLE.selectedArea);
         }
     }
 
@@ -172,7 +222,10 @@ export default class SudokuGraphic {
         for (let r = 0; r < Sudoku.SIZE; r++) {
             for (let c = 0; c < Sudoku.SIZE; c++) {
                 if (value == 0 || value != this.sudoku.GRID[r][c]) continue;
-                this.fillColorBlockByIdx({ r: r, c: c }, SudokuGraphic.STYLE.selectedBlockValue);
+                this.fillColorBlockByIdx({
+                    r: r,
+                    c: c
+                }, SudokuGraphic.STYLE.selectedBlockValue);
             }
         }
     }

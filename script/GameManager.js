@@ -16,7 +16,8 @@ const {
     scan,
     startWith,
     switchMap,
-    tap
+    tap,
+    throttleTime
 } = rxjs.operators;
 
 window.onload = () => {
@@ -25,6 +26,7 @@ window.onload = () => {
 
     const isLoading$ = new BehaviorSubject(true);
     const levelGame$ = new BehaviorSubject(1);
+    var fromClickOnSudokuGrid$;
 
     const initGame = () => {
         CANVAS = document.querySelector("#canvas");
@@ -50,10 +52,16 @@ window.onload = () => {
                 typeEvent: "select-dropdown",
                 count: true,
                 value: 0
+            })),
+
+            fromClickOnSudokuGrid$.pipe(mapTo({
+                typeEvent: "click-on-grid",
+                count: false
             }))
         );
 
         const stopWatch$ = eventStopWatch$.pipe(
+            throttleTime(1000),
             startWith({
                 count: true,
                 speed: 1000,
@@ -65,6 +73,7 @@ window.onload = () => {
                 };
                 if (state.typeEvent == "click-on-toggle") {
                     state.count = !state.count;
+                    state.count ? SUDOKU_GRAPHIC.drawPlayScreen() : SUDOKU_GRAPHIC.drawPauseScreen();
                 } else {
                     state.count = true;
                 }
@@ -99,7 +108,7 @@ window.onload = () => {
     }
 
     const initClickOnGridSudokuEvent = () => {
-        const fromClickOnSudokuGrid$ = fromEvent(CANVAS, 'click');
+        fromClickOnSudokuGrid$ = fromEvent(CANVAS, 'click');
         fromClickOnSudokuGrid$.subscribe((e) => handleClickOnSudokuGrid(e));
     }
 
@@ -112,9 +121,7 @@ window.onload = () => {
     const initSudoku = (level = 1) => {
         SUDOKU = new Sudoku(level);
         SUDOKU_GRAPHIC = new SudokuGraphic(CANVAS, SUDOKU);
-        SUDOKU_GRAPHIC.clearEntireSudoku();
-        SUDOKU_GRAPHIC.drawGridSudoku();
-        SUDOKU_GRAPHIC.drawNumberIntoGrid();
+        SUDOKU_GRAPHIC.drawPlayScreen();
     }
 
     const handleClickOnSudokuGrid = (event) => {
