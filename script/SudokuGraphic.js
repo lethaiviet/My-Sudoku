@@ -186,6 +186,7 @@ export default class SudokuGraphic {
         this.fillColorBlocksInSubGridByIdx(idx);
         this.fillColorBlockByValue(idx);
         this.fillColorBlockByIdx(idx, SudokuGraphic.STYLE.selectedBlock);
+        this.fillColorWrongBlocks();
         this.drawGridSudoku();
         this.drawNumberIntoGrid();
         this.drawNumberIntoGrid(this.sudoku.FILLED_GRID, SudokuGraphic.STYLE.filledNumTextColor);
@@ -206,6 +207,18 @@ export default class SudokuGraphic {
             SudokuGraphic.BLOCK_SIZE,
             SudokuGraphic.BLOCK_SIZE
         );
+    }
+
+    fillColorWrongBlocks(grid = this.sudoku.WRONG_GRID) {
+        for (let r = 0; r < Sudoku.SIZE; r++) {
+            for (let c = 0; c < Sudoku.SIZE; c++) {
+                if (grid[r][c] == 0) continue;
+                this.fillColorBlockByIdx({
+                    r: r,
+                    c: c
+                }, 'red');
+            }
+        }
     }
 
     fillColorBlocksInRowAndColByIdx(idx) {

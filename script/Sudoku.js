@@ -143,5 +143,69 @@ export default class Sudoku {
     changeBlockValueByIdx(idx, value) {
         if (idx.r < 0 || idx.c < 0 || this.GRID[idx.r][idx.c] != 0) return;
         this.FILLED_GRID[idx.r][idx.c] = value;
+        this.updateWrongGridByAllFilledBlocks();
+    }
+
+    updateWrongGridByFilledBlock = (idx, value) => {
+        const invalidBlocks = this.getAllInvalidBlocksByFilledBlock(idx, value);
+        for (const block of invalidBlocks) {
+            this.WRONG_GRID[block.r][block.c] = value;
+        }
+    }
+
+    updateWrongGridByAllFilledBlocks = () => {
+        this.createZeroGrid(this.WRONG_GRID);
+        for (let r = 0; r < Sudoku.SIZE; r++) {
+            for (let c = 0; c < Sudoku.SIZE; c++) {
+                if (this.FILLED_GRID[r][c] == 0) continue;
+                this.updateWrongGridByFilledBlock(Utils.creatIdxObj(r, c), this.FILLED_GRID[r][c]);
+            }
+        }
+    }
+
+    checkColsAndRowsSudoku() {
+        const grid = Utils.mergeMatrix(this.GRID, this.FILLED_GRID);
+        for (let i = 0; i < 9; i++) {
+            let row = grid[i];
+            let col = grid.map(val => val[i]);
+
+            if (checkDuplicatedValueInArray(row) ||
+                checkDuplicatedValueInArray(col))
+                return false;
+        }
+        return true;
+    }
+
+    getAllInvalidBlocksByFilledBlock(idx, value) {
+        const grid = Utils.mergeMatrix(this.GRID, this.FILLED_GRID);
+        const list1 = this.getAllInvalidBlockOnColAndRowByFilledBlock(grid, idx, value);
+        const list2 = this.getAllInvalidBlockOnSubGridByFilledBlock(grid, idx, value);
+        return [...new Set([...list1, ...list2])];
+    }
+
+    getAllInvalidBlockOnColAndRowByFilledBlock(grid, idx, value) {
+        let list = [];
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            if (i != idx.c && grid[idx.r][i] == value) list.push(Utils.creatIdxObj(idx.r, i));
+            if (i != idx.r && grid[i][idx.c] == value) list.push(Utils.creatIdxObj(i, idx.c));
+        }
+
+        if (list.length != 0) list.push(idx);
+        return list;
+    }
+
+    getAllInvalidBlockOnSubGridByFilledBlock(grid, idx, value) {
+        let list = [];
+        const x = Math.floor(idx.c / Sudoku.SUB_GRID_SIZE);
+        const y = Math.floor(idx.r / Sudoku.SUB_GRID_SIZE);
+
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            let c = x * Sudoku.SUB_GRID_SIZE + i % Sudoku.SUB_GRID_SIZE;
+            let r = y * Sudoku.SUB_GRID_SIZE + Math.floor(i / Sudoku.SUB_GRID_SIZE);
+            if ((r != idx.r && c != idx.c) && grid[r][c] == value) list.push(Utils.creatIdxObj(r, c));
+        }
+
+        if (list.length != 0) list.push(idx);
+        return list;
     }
 }

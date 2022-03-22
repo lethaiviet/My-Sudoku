@@ -54,4 +54,24 @@ export default class Utils {
 
         return `${pad(m)}:${pad(s)}`;
     }
+
+    static mergeMatrix(matrix1, matrix2) {
+        const N = matrix1.length;
+        let matrix = [];
+
+        for (let i = 0; i < N; i++) {
+            matrix[i] = [];
+            for (let j = 0; j < N; j++) {
+                matrix[i][j] = matrix2[i][j] != 0 ? matrix2[i][j] : matrix1[i][j];
+            }
+        }
+        return matrix;
+    }
+
+    static creatIdxObj(r, c) {
+        return {
+            r: r,
+            c: c
+        };
+    }
 }
