@@ -5,10 +5,8 @@ const {
     BehaviorSubject,
     fromEvent,
     merge,
-    empty,
     interval,
     NEVER,
-    publish
 } = rxjs;
 
 const {
@@ -54,14 +52,15 @@ window.onload = () => {
                 value: 0
             })),
 
-            fromClickOnSudokuGrid$.pipe(mapTo({
-                typeEvent: "click-on-grid",
-                count: false
-            }))
+            fromClickOnSudokuGrid$.pipe(
+                throttleTime(1000),
+                mapTo({
+                    typeEvent: "click-on-grid",
+                    count: false
+                }))
         );
 
         const stopWatch$ = eventStopWatch$.pipe(
-            throttleTime(1000),
             startWith({
                 count: true,
                 speed: 1000,
