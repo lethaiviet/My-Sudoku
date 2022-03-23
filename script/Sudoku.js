@@ -161,12 +161,13 @@ export default class Sudoku {
         this.FILLED_GRID[idx.r][idx.c] = this.FILLED_GRID[idx.r][idx.c] == value ? 0 : value;
         this.PENCIL_GRID[idx.r][idx.c] = [];
         this.updateWrongGridByAllFilledBlocks();
+        this.correctPencilBlockByFilledBlock(idx, value);
     }
 
     changePencilBlockValueByIdx(idx, value) {
         const hasValue = this.PENCIL_GRID[idx.r][idx.c].includes(value);
         if (hasValue) {
-            this.PENCIL_GRID[idx.r][idx.c] = this.PENCIL_GRID[idx.r][idx.c].filter(x => x != value);
+            this.PENCIL_GRID[idx.r][idx.c] = Utils.arrayRemove(this.PENCIL_GRID[idx.r][idx.c], value);
         } else {
             this.PENCIL_GRID[idx.r][idx.c].push(value);
         }
@@ -187,6 +188,29 @@ export default class Sudoku {
                 if (this.FILLED_GRID[r][c] == 0) continue;
                 this.updateWrongGridByFilledBlock(Utils.creatIdxObj(r, c), this.FILLED_GRID[r][c]);
             }
+        }
+    }
+
+    correctPencilBlockByFilledBlock(idx, val) {
+        this.correctPencilBlockOnColAndRowByFilledBlock(idx, val);
+        this.correctPencilBlockOnSubGridByFilledBlock(idx, val)
+    }
+
+    correctPencilBlockOnColAndRowByFilledBlock(idx, value) {
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            this.PENCIL_GRID[idx.r][i] = Utils.arrayRemove(this.PENCIL_GRID[idx.r][i], value);
+            this.PENCIL_GRID[i][idx.c] = Utils.arrayRemove(this.PENCIL_GRID[i][idx.c], value);
+        }
+    }
+
+    correctPencilBlockOnSubGridByFilledBlock(idx, value) {
+        const x = Math.floor(idx.c / Sudoku.SUB_GRID_SIZE);
+        const y = Math.floor(idx.r / Sudoku.SUB_GRID_SIZE);
+
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            let c = x * Sudoku.SUB_GRID_SIZE + i % Sudoku.SUB_GRID_SIZE;
+            let r = y * Sudoku.SUB_GRID_SIZE + Math.floor(i / Sudoku.SUB_GRID_SIZE);
+            this.PENCIL_GRID[r][c] = Utils.arrayRemove(this.PENCIL_GRID[r][c], value);
         }
     }
 

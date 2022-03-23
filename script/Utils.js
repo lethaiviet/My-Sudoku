@@ -82,4 +82,10 @@ export default class Utils {
             value: value
         };
     }
+
+    static arrayRemove(arr, value) {
+        return arr.filter(function(val) {
+            return value != val
+        });
+    }
 }
