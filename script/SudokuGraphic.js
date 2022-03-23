@@ -7,6 +7,7 @@ import Utils from "./Utils.js";
 
 export default class SudokuGraphic {
     static BLOCK_SIZE = CONST.SQUARE_SIZE;
+    static PENCIL_BLOCK_SIZE = SudokuGraphic.BLOCK_SIZE / 3;
     static GRID_SIZE = Sudoku.SIZE * SudokuGraphic.BLOCK_SIZE;
     static TEXT_SIZE = SudokuGraphic.BLOCK_SIZE * 0.7;
     static PADDING = 10;
@@ -24,6 +25,7 @@ export default class SudokuGraphic {
         selectedBlockValue: '#C3D7EA',
         invalidBlock: '#F7CFD6',
         numbTextFont: `300 ${SudokuGraphic.TEXT_SIZE}px Inter`,
+        numbSmallTextFont: `300 ${SudokuGraphic.TEXT_SIZE / 3}px Inter`,
     };
 
     constructor(canvas, sudoku) {
@@ -32,6 +34,7 @@ export default class SudokuGraphic {
         this.autoResizeCanvas();
         this.ctx = this.canvas.getContext('2d');
         this.isCheckingMistakes = true;
+        this.isPencilMode = false;
         //MAP_BLOCK contains all the vertices of block
         //Ex: MAP_BLOCK[0][0].topLeft.x is the x coordinate top left of the block at (0,0)
         this.MAP_BLOCK = [];
@@ -129,6 +132,7 @@ export default class SudokuGraphic {
         this.drawGridSudoku();
         this.drawNumberIntoGrid();
         this.drawNumberIntoGridWithCheckingMistakes();
+        this.drawPencilGrid();
     }
 
     drawGridSudoku() {
@@ -146,6 +150,31 @@ export default class SudokuGraphic {
             this.ctx.moveTo(this.MAP_BLOCK[0][i].topLeft.x, this.MAP_BLOCK[0][i].topLeft.y);
             this.ctx.lineTo(this.MAP_BLOCK[9][i].topLeft.x, this.MAP_BLOCK[9][i].topLeft.y);
             this.ctx.stroke();
+        }
+    }
+
+    drawPencilBlock(idx, numb) {
+        const size = SudokuGraphic.PENCIL_BLOCK_SIZE;
+        const topLeft = this.MAP_BLOCK[idx.r][idx.c].topLeft;
+
+        const topLeftAtNumb = {
+            x: topLeft.x + (numb - 1) % 3 * size,
+            y: topLeft.y + Math.floor((numb - 1) / 3) * size,
+        }
+
+        const center = Utils.getPosByDirection(topLeftAtNumb, Direction.DOWN_RIGHT, size / 2);
+
+        this.drawNumberAt(numb, center, 'green', SudokuGraphic.STYLE.numbSmallTextFont);
+    }
+
+    drawPencilGrid() {
+        for (let r = 0; r < Sudoku.SIZE; r++) {
+            for (let c = 0; c < Sudoku.SIZE; c++) {
+                const idx = Utils.creatIdxObj(r, c);
+                for (const numb of this.sudoku.PENCIL_GRID[r][c]) {
+                    this.drawPencilBlock(idx, numb);
+                }
+            }
         }
     }
 
@@ -172,11 +201,11 @@ export default class SudokuGraphic {
         this.drawNumberAt(grid[r][c], this.MAP_BLOCK[r][c].center, txtColor);
     }
 
-    drawNumberAt(num, center, txtColor) {
+    drawNumberAt(num, center, txtColor, font = SudokuGraphic.STYLE.numbTextFont) {
         if (num == 0) return;
         this.ctx.lineWidth = 1;
         this.ctx.fillStyle = txtColor;
-        this.ctx.font = SudokuGraphic.STYLE.numbTextFont;
+        this.ctx.font = font;
 
         const wText = this.ctx.measureText(num).width;
         const hText = this.ctx.measureText('M').width;
@@ -186,7 +215,7 @@ export default class SudokuGraphic {
     }
 
     changeBlockValueAndDraw(value) {
-        this.sudoku.changeBlockValueByIdx(SudokuGraphic.SELECTED_BLOCK_ID, value);
+        this.sudoku.changeBlockValueByIdx(SudokuGraphic.SELECTED_BLOCK_ID, value, this.isPencilMode);
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
     }
 
@@ -201,6 +230,7 @@ export default class SudokuGraphic {
         this.drawGridSudoku();
         this.drawNumberIntoGrid();
         this.drawNumberIntoGridWithCheckingMistakes();
+        this.drawPencilGrid();
     }
 
     fillColorSelectedAreaByPosition(pos) {
@@ -303,5 +333,9 @@ export default class SudokuGraphic {
 
     enableCheckingMistakes(enable) {
         this.isCheckingMistakes = enable;
+    }
+
+    enablePencilMode(enable) {
+        this.isPencilMode = enable;
     }
 }

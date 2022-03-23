@@ -41,7 +41,7 @@ window.onload = () => {
         initNewGameEvent();
         initNumPadsEvent();
         initToggleAutoCheckMistake();
-        // initGameControlsEvent();
+        initGameControlsEvent();
     }
 
     const initWatchStopEvent = () => {
@@ -174,6 +174,16 @@ window.onload = () => {
         numpad$.subscribe();
     }
 
+    const initGameControlsEvent = () => {
+        fromClick("pencil-btn").pipe(
+            scan((state) => !state, false)
+        ).subscribe((state) => {
+            state ? document.getElementById("pencil-btn").classList.add("btn-force-hover") :
+                document.getElementById("pencil-btn").classList.remove("btn-force-hover");
+            SUDOKU_GRAPHIC.enablePencilMode(state);
+        });
+    }
+
     const initToggleAutoCheckMistake = () => {
         fromClick("auto-check-mistake-toggle").subscribe((e) => {
             SUDOKU_GRAPHIC.enableCheckingMistakes(e.target.checked);
@@ -211,12 +221,6 @@ window.onload = () => {
     const setIconPlayPauseBtn = (isCounting) => {
         const attribute = isCounting ? "fa fa-pause" : "fa fa-play";
         PLAY_PAUSE_BTN.querySelector("i").setAttribute("class", attribute);
-    }
-
-    const isCounting = () => {
-        const typeBtn = PLAY_PAUSE_BTN.querySelector("i").className;
-        console.log(`isCounting: ${typeBtn == "fa fa-pause"}`)
-        return typeBtn == "fa fa-pause";
     }
 
     WebFont.load({
