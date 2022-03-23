@@ -276,6 +276,10 @@ export default class Sudoku {
         });
     }
 
+    resetBackupData() {
+        this.BLOCK_STACK = [];
+    }
+
     revertToPrevData() {
         if (this.BLOCK_STACK.length == 0) return;
 
@@ -292,5 +296,6 @@ export default class Sudoku {
         this.PENCIL_GRID[idx.r][idx.c] = [];
         this.updateWrongGridByAllFilledBlocks();
         this.correctPencilBlockByFilledBlock(idx, value);
+        this.resetBackupData();
     }
 }
