@@ -40,6 +40,8 @@ window.onload = () => {
         initWatchStopEvent();
         initNewGameEvent();
         initNumPadsEvent();
+        initToggleAutoCheckMistake();
+        // initGameControlsEvent();
     }
 
     const initWatchStopEvent = () => {
@@ -159,15 +161,24 @@ window.onload = () => {
             fromClickToMap("numpad-9", {
                 value: 9
             }),
+            fromClickToMap("eraser-btn", {
+                value: 0
+            }),
         );
 
         const numpad$ = event$.pipe(
             throttleTime(200),
-            tap(state => console.table(state)),
             tap((state) => SUDOKU_GRAPHIC.changeBlockValueAndDraw(state.value))
         )
 
         numpad$.subscribe();
+    }
+
+    const initToggleAutoCheckMistake = () => {
+        fromClick("auto-check-mistake-toggle").subscribe((e) => {
+            SUDOKU_GRAPHIC.enableCheckingMistakes(e.target.checked);
+            SUDOKU_GRAPHIC.fillColorSelectedAreaByIdx();
+        });
     }
 
     const initSudoku = (level = 1) => {

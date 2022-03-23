@@ -12,6 +12,7 @@ export default class Sudoku {
         this.GRID = [];
         this.FILLED_GRID = [];
         this.WRONG_GRID = [];
+        this.BLOCK_STACK = [];
         this.generateLevelSudoku(level);
         this.createZeroGrid(this.FILLED_GRID);
         this.createZeroGrid(this.WRONG_GRID);
@@ -142,7 +143,7 @@ export default class Sudoku {
 
     changeBlockValueByIdx(idx, value) {
         if (idx.r < 0 || idx.c < 0 || this.GRID[idx.r][idx.c] != 0) return;
-        this.FILLED_GRID[idx.r][idx.c] = value;
+        this.FILLED_GRID[idx.r][idx.c] = this.FILLED_GRID[idx.r][idx.c] == value ? 0 : value;
         this.updateWrongGridByAllFilledBlocks();
     }
 
@@ -177,7 +178,7 @@ export default class Sudoku {
     }
 
     getAllInvalidBlocksByFilledBlock(idx, value) {
-        const grid = Utils.mergeMatrix(this.GRID, this.FILLED_GRID);
+        const grid = this.getSolvedGrid();
         const list1 = this.getAllInvalidBlockOnColAndRowByFilledBlock(grid, idx, value);
         const list2 = this.getAllInvalidBlockOnSubGridByFilledBlock(grid, idx, value);
         return [...new Set([...list1, ...list2])];
@@ -207,5 +208,9 @@ export default class Sudoku {
 
         if (list.length != 0) list.push(idx);
         return list;
+    }
+
+    getSolvedGrid() {
+        return Utils.mergeMatrix(this.GRID, this.FILLED_GRID);
     }
 }

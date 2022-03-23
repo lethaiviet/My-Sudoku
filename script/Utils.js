@@ -74,4 +74,12 @@ export default class Utils {
             c: c
         };
     }
+
+    static creatBlockObj(r, c, value) {
+        return {
+            r: r,
+            c: c,
+            value: value
+        };
+    }
 }

@@ -17,10 +17,12 @@ export default class SudokuGraphic {
         thickLine: 'black',
         backGround: 'white',
         numbTextColor: '#3C5068',
+        invalidNumbTextColor: '#E55C6C',
         filledNumTextColor: '#0072E3',
         selectedArea: '#E2EBF3',
         selectedBlock: '#BBDEFB',
         selectedBlockValue: '#C3D7EA',
+        invalidBlock: '#F7CFD6',
         numbTextFont: `300 ${SudokuGraphic.TEXT_SIZE}px Inter`,
     };
 
@@ -29,7 +31,7 @@ export default class SudokuGraphic {
         this.sudoku = sudoku;
         this.autoResizeCanvas();
         this.ctx = this.canvas.getContext('2d');
-
+        this.isCheckingMistakes = true;
         //MAP_BLOCK contains all the vertices of block
         //Ex: MAP_BLOCK[0][0].topLeft.x is the x coordinate top left of the block at (0,0)
         this.MAP_BLOCK = [];
@@ -126,6 +128,7 @@ export default class SudokuGraphic {
         this.clearEntireSudoku();
         this.drawGridSudoku();
         this.drawNumberIntoGrid();
+        this.drawNumberIntoGridWithCheckingMistakes();
     }
 
     drawGridSudoku() {
@@ -143,6 +146,17 @@ export default class SudokuGraphic {
             this.ctx.moveTo(this.MAP_BLOCK[0][i].topLeft.x, this.MAP_BLOCK[0][i].topLeft.y);
             this.ctx.lineTo(this.MAP_BLOCK[9][i].topLeft.x, this.MAP_BLOCK[9][i].topLeft.y);
             this.ctx.stroke();
+        }
+    }
+
+    drawNumberIntoGridWithCheckingMistakes() {
+        for (let r = 0; r < Sudoku.SIZE; r++) {
+            for (let c = 0; c < Sudoku.SIZE; c++) {
+                let style = this.isCheckingMistakes && this.sudoku.WRONG_GRID[r][c] != 0 ?
+                    SudokuGraphic.STYLE.invalidNumbTextColor :
+                    SudokuGraphic.STYLE.filledNumTextColor;
+                this.drawNumberAtIdxBlock(r, c, this.sudoku.FILLED_GRID, style);
+            }
         }
     }
 
@@ -176,17 +190,17 @@ export default class SudokuGraphic {
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
     }
 
-    fillColorSelectedAreaByIdx(idx) {
+    fillColorSelectedAreaByIdx(idx = SudokuGraphic.SELECTED_BLOCK_ID) {
         if (idx.r < 0 || idx.c < 0) return;
         this.clearEntireSudoku();
         this.fillColorBlocksInRowAndColByIdx(idx);
         this.fillColorBlocksInSubGridByIdx(idx);
         this.fillColorBlockByValue(idx);
-        this.fillColorBlockByIdx(idx, SudokuGraphic.STYLE.selectedBlock);
         this.fillColorWrongBlocks();
+        this.fillColorBlockByIdx(idx, SudokuGraphic.STYLE.selectedBlock);
         this.drawGridSudoku();
         this.drawNumberIntoGrid();
-        this.drawNumberIntoGrid(this.sudoku.FILLED_GRID, SudokuGraphic.STYLE.filledNumTextColor);
+        this.drawNumberIntoGridWithCheckingMistakes();
     }
 
     fillColorSelectedAreaByPosition(pos) {
@@ -210,7 +224,7 @@ export default class SudokuGraphic {
         for (let r = 0; r < Sudoku.SIZE; r++) {
             for (let c = 0; c < Sudoku.SIZE; c++) {
                 if (grid[r][c] == 0) continue;
-                this.fillColorBlockByIdx(Utils.creatIdxObj(r, c), 'red');
+                this.fillColorBlockByIdx(Utils.creatIdxObj(r, c), SudokuGraphic.STYLE.invalidBlock);
             }
         }
     }
@@ -234,10 +248,11 @@ export default class SudokuGraphic {
     }
 
     fillColorBlockByValue(idx) {
-        let value = this.sudoku.GRID[idx.r][idx.c];
+        let grid = this.sudoku.getSolvedGrid();
+        let value = grid[idx.r][idx.c];
         for (let r = 0; r < Sudoku.SIZE; r++) {
             for (let c = 0; c < Sudoku.SIZE; c++) {
-                if (value == 0 || value != this.sudoku.GRID[r][c]) continue;
+                if (value == 0 || value != grid[r][c]) continue;
                 this.fillColorBlockByIdx(Utils.creatIdxObj(r, c), SudokuGraphic.STYLE.selectedBlockValue);
             }
         }
@@ -284,5 +299,9 @@ export default class SudokuGraphic {
         this.ctx.strokeStyle = SudokuGraphic.STYLE.thickLine;
         this.ctx.setLineDash([]);
         this.ctx.lineWidth = 2;
+    }
+
+    enableCheckingMistakes(enable) {
+        this.isCheckingMistakes = enable;
     }
 }
