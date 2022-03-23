@@ -276,9 +276,10 @@ export default class Sudoku {
 
     revertToPrevData() {
         if (this.BLOCK_STACK.length == 0) return;
-        
+
         const prevData = this.BLOCK_STACK.pop();
         this.FILLED_GRID = prevData.FILLED_GRID;
         this.PENCIL_GRID = prevData.PENCIL_GRID;
+        this.updateWrongGridByAllFilledBlocks();
     }
 }
