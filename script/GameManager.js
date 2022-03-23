@@ -184,6 +184,7 @@ window.onload = () => {
         });
 
         fromClick("undo-btn").subscribe(() => SUDOKU_GRAPHIC.undoAndDraw());
+        fromClick("hint-btn").subscribe(() => SUDOKU_GRAPHIC.useHintAndDraw());
     }
 
     const initToggleAutoCheckMistake = () => {

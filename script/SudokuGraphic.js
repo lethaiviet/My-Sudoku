@@ -224,6 +224,11 @@ export default class SudokuGraphic {
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
     }
 
+    useHintAndDraw() {
+        this.sudoku.useHintAt(SudokuGraphic.SELECTED_BLOCK_ID);
+        this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
+    }
+
     fillColorSelectedAreaByIdx(idx = SudokuGraphic.SELECTED_BLOCK_ID) {
         if (idx.r < 0 || idx.c < 0) return;
         this.clearEntireSudoku();

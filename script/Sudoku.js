@@ -14,6 +14,7 @@ export default class Sudoku {
         this.PENCIL_GRID = [];
         this.WRONG_GRID = [];
         this.BLOCK_STACK = [];
+        this.ANSWER_GRID = [];
         this.generateLevelSudoku(level);
         this.createZeroGrid(this.FILLED_GRID);
         this.createZeroGrid(this.WRONG_GRID);
@@ -74,6 +75,7 @@ export default class Sudoku {
     generateLevelSudoku(level = 1) {
         this.createZeroGrid();
         this.fillRandomValueIntoGrid();
+        this.ANSWER_GRID = Utils.clone(this.GRID);
 
         while (level > 0) {
             let col = Utils.randomIntFromInterval(0, 8);
@@ -281,5 +283,14 @@ export default class Sudoku {
         this.FILLED_GRID = prevData.FILLED_GRID;
         this.PENCIL_GRID = prevData.PENCIL_GRID;
         this.updateWrongGridByAllFilledBlocks();
+    }
+
+    useHintAt(idx) {
+        const value = this.ANSWER_GRID[idx.r][idx.c];
+        this.GRID[idx.r][idx.c] = value;
+        this.FILLED_GRID[idx.r][idx.c] = 0;
+        this.PENCIL_GRID[idx.r][idx.c] = [];
+        this.updateWrongGridByAllFilledBlocks();
+        this.correctPencilBlockByFilledBlock(idx, value);
     }
 }
