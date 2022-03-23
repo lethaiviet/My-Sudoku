@@ -18,6 +18,7 @@ export default class SudokuGraphic {
         thickLine: 'black',
         backGround: 'white',
         numbTextColor: '#3C5068',
+        numbSmallTextColor: '#748190',
         invalidNumbTextColor: '#E55C6C',
         filledNumTextColor: '#0072E3',
         selectedArea: '#E2EBF3',
@@ -164,7 +165,7 @@ export default class SudokuGraphic {
 
         const center = Utils.getPosByDirection(topLeftAtNumb, Direction.DOWN_RIGHT, size / 2);
 
-        this.drawNumberAt(numb, center, 'green', SudokuGraphic.STYLE.numbSmallTextFont);
+        this.drawNumberAt(numb, center, SudokuGraphic.STYLE.numbSmallTextColor, SudokuGraphic.STYLE.numbSmallTextFont);
     }
 
     drawPencilGrid() {
