@@ -219,6 +219,11 @@ export default class SudokuGraphic {
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
     }
 
+    undoAndDraw() {
+        this.sudoku.revertToPrevData();
+        this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
+    }
+
     fillColorSelectedAreaByIdx(idx = SudokuGraphic.SELECTED_BLOCK_ID) {
         if (idx.r < 0 || idx.c < 0) return;
         this.clearEntireSudoku();

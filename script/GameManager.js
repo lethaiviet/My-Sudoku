@@ -182,6 +182,8 @@ window.onload = () => {
                 document.getElementById("pencil-btn").classList.remove("btn-force-hover");
             SUDOKU_GRAPHIC.enablePencilMode(state);
         });
+
+        fromClick("undo-btn").subscribe(() => SUDOKU_GRAPHIC.undoAndDraw());
     }
 
     const initToggleAutoCheckMistake = () => {

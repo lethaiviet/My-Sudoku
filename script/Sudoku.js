@@ -154,6 +154,7 @@ export default class Sudoku {
 
     changeBlockValueByIdx(idx, value, isPencilMode = false) {
         if (idx.r < 0 || idx.c < 0 || this.GRID[idx.r][idx.c] != 0) return;
+        this.backupData();
         isPencilMode ? this.changePencilBlockValueByIdx(idx, value) : this.changeFilledBlockValueByIdx(idx, value);
     }
 
@@ -166,7 +167,9 @@ export default class Sudoku {
 
     changePencilBlockValueByIdx(idx, value) {
         const hasValue = this.PENCIL_GRID[idx.r][idx.c].includes(value);
-        if (hasValue) {
+        if (value == 0) {
+            this.PENCIL_GRID[idx.r][idx.c] = [];
+        } else if (hasValue) {
             this.PENCIL_GRID[idx.r][idx.c] = Utils.arrayRemove(this.PENCIL_GRID[idx.r][idx.c], value);
         } else {
             this.PENCIL_GRID[idx.r][idx.c].push(value);
@@ -262,5 +265,20 @@ export default class Sudoku {
 
     getSolvedGrid() {
         return Utils.mergeMatrix(this.GRID, this.FILLED_GRID);
+    }
+
+    backupData() {
+        this.BLOCK_STACK.push({
+            FILLED_GRID: Utils.clone(this.FILLED_GRID),
+            PENCIL_GRID: Utils.clone(this.PENCIL_GRID)
+        });
+    }
+
+    revertToPrevData() {
+        if (this.BLOCK_STACK.length == 0) return;
+        
+        const prevData = this.BLOCK_STACK.pop();
+        this.FILLED_GRID = prevData.FILLED_GRID;
+        this.PENCIL_GRID = prevData.PENCIL_GRID;
     }
 }
