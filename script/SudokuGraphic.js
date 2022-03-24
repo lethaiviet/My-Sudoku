@@ -233,6 +233,7 @@ export default class SudokuGraphic {
     }
 
     undoAndDraw() {
+        if (SudokuGraphic.SELECTED_BLOCK_ID.r == -1 || SudokuGraphic.SELECTED_BLOCK_ID.c == -1) return;
         this.sudoku.revertToPrevData();
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
     }
