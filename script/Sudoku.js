@@ -274,7 +274,6 @@ export default class Sudoku {
             Math.floor(idx.c / Sudoku.SUB_GRID_SIZE),
             Math.floor(idx.r / Sudoku.SUB_GRID_SIZE),
             grid);
-        console.table(subGrid)
         return this.checkValidArray(subGrid);
     }
 

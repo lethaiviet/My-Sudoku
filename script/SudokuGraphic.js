@@ -103,7 +103,6 @@ export default class SudokuGraphic {
         const idx = Math.floor(Sudoku.SIZE / 2);
         const r = SudokuGraphic.BLOCK_SIZE * 0.8;
         const d = SudokuGraphic.BLOCK_SIZE * 0.2;
-        console.log(r)
         this.ctx.beginPath();
         this.ctx.strokeStyle = '#0D6EFD';
         this.ctx.arc(

@@ -116,7 +116,6 @@ window.onload = () => {
             isLoading$.next(true);
 
             //Set time out = 50ms to avoid initSudoku func block render/repair the splash screen. 
-            console.log("initNewGameEvent " + LEVEL.value)
             setTimeout(() => levelGame$.next(LEVEL.value), 50);
         });
     }
