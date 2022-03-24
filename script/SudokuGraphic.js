@@ -12,7 +12,7 @@ export default class SudokuGraphic {
     static TEXT_SIZE = SudokuGraphic.BLOCK_SIZE * 0.7;
     static PADDING = 10;
     static SELECTED_BLOCK_ID = Utils.creatIdxObj(-1, -1);
-    static COLORS_LIST = ["#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA", "#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA", "#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA"];
+    static COLORS_LIST = ["#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA", "#B2C6DD", "#C3D4E5", "#D8E4EF"];
 
     static STYLE = {
         thinLine: 'gray',
@@ -223,7 +223,7 @@ export default class SudokuGraphic {
         this.sudoku.changeBlockValueByIdx(SudokuGraphic.SELECTED_BLOCK_ID, value, this.isPencilMode);
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
         this.stopAnimation();
-        if (this.sudoku.hasAnyColsOrRowsOrSubGridCompletedAt(SudokuGraphic.SELECTED_BLOCK_ID)) {
+        if (!this.isPencilMode && this.sudoku.hasAnyColsOrRowsOrSubGridCompletedAt(SudokuGraphic.SELECTED_BLOCK_ID)) {
             this.initAnimation(SudokuGraphic.SELECTED_BLOCK_ID);
         }
     }
@@ -272,7 +272,7 @@ export default class SudokuGraphic {
                 for (const neighbor of neighbors) {
                     if (this.LIST_IDX_TRAVERSE.includes(neighbor.toString())) continue;
                     this.LIST_IDX_TRAVERSE.push(neighbor.toString());
-                    this.MAP_IDX_COLOR[neighbor] = idxColor + 1;
+                    this.MAP_IDX_COLOR[neighbor] = idxColor;
                 }
             }
         }
@@ -288,7 +288,7 @@ export default class SudokuGraphic {
         this.LIST_IDX_TRAVERSE.push([
             [idx.r, idx.c]
         ].toString());
-        this.intervalAnimation = setInterval(this.animationFinishColOrRowOrSquareSudoku.bind(this), 80);
+        this.intervalAnimation = setInterval(this.animationFinishColOrRowOrSquareSudoku.bind(this), 100);
     }
 
     stopAnimation() {
