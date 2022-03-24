@@ -28,6 +28,7 @@ export default class SudokuGraphic {
         invalidBlock: '#F7CFD6',
         numbTextFont: `300 ${SudokuGraphic.TEXT_SIZE}px Inter`,
         numbSmallTextFont: `300 ${SudokuGraphic.TEXT_SIZE / 3}px Inter`,
+        bigTextFont: `300 ${SudokuGraphic.BLOCK_SIZE * 0.9}px Inter`,
     };
 
     constructor(canvas, sudoku) {
@@ -139,6 +140,12 @@ export default class SudokuGraphic {
         this.drawPencilGrid();
     }
 
+    drawWinGameScreen() {
+        this.ctx.fillStyle = '#0d6efd';
+        this.ctx.fillRect(0, 0, CONST.FULL_SCREEN.w, CONST.FULL_SCREEN.h);
+        this.drawNumberAt("GOOD JOB", this.MAP_BLOCK[4][4].center, 'white', SudokuGraphic.STYLE.bigTextFont);
+    }
+
     drawGridSudoku() {
         const N = Sudoku.SIZE + 1;
 
@@ -207,7 +214,6 @@ export default class SudokuGraphic {
 
     drawNumberAt(num, center, txtColor, font = SudokuGraphic.STYLE.numbTextFont) {
         if (num == 0) return;
-        this.ctx.lineWidth = 1;
         this.ctx.fillStyle = txtColor;
         this.ctx.font = font;
 
@@ -215,7 +221,6 @@ export default class SudokuGraphic {
         const hText = this.ctx.measureText('M').width;
 
         this.ctx.fillText(num, center.x - wText / 2, center.y + hText / 2, wText);
-        this.ctx.stroke();
     }
 
     changeBlockValueAndDraw(value) {
@@ -256,7 +261,7 @@ export default class SudokuGraphic {
         if (Object.keys(this.MAP_IDX_COLOR).length == 0) {
             this.stopAnimation();
             if (this.sudoku.isCompleted()) {
-                this.drawPauseScreen();
+                this.drawWinGameScreen();
                 return;
             }
         } else {
