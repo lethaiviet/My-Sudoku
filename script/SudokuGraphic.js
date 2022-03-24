@@ -243,7 +243,7 @@ export default class SudokuGraphic {
         const isAtRowWithAnim = (state.isCompletedRow && this.sudoku.isAtSameRow(idx, SudokuGraphic.SELECTED_BLOCK_ID));
         const isAtColWithAnim = (state.isCompletedCol && this.sudoku.isAtSameCol(idx, SudokuGraphic.SELECTED_BLOCK_ID));
         const isAtGridWithAnim = (state.isCompletedSubGrid && this.sudoku.isAtSameSubGrid(idx, SudokuGraphic.SELECTED_BLOCK_ID));
-        return isAtColWithAnim || isAtRowWithAnim || isAtGridWithAnim;
+        return state.isCompletedEntireGrid || isAtColWithAnim || isAtRowWithAnim || isAtGridWithAnim;
     }
 
     animationFinishColOrRowOrSquareSudoku() {
@@ -256,6 +256,10 @@ export default class SudokuGraphic {
 
         if (Object.keys(this.MAP_IDX_COLOR).length == 0) {
             this.stopAnimation();
+            if (this.sudoku.isCompleted()) {
+                this.drawPauseScreen();
+                return;
+            }
         } else {
             for (const [idxStr, idxColor] of Object.entries(this.MAP_IDX_COLOR)) {
                 const idxObj = Utils.convertStrToIdxObj(idxStr);
@@ -285,9 +289,7 @@ export default class SudokuGraphic {
     initAnimation(idx = SudokuGraphic.SELECTED_BLOCK_ID) {
         this.MAP_IDX_COLOR[[idx.r, idx.c]] = SudokuGraphic.COLORS_LIST.length - 1;
         this.LIST_IDX_TRAVERSE = [];
-        this.LIST_IDX_TRAVERSE.push([
-            [idx.r, idx.c]
-        ].toString());
+        this.LIST_IDX_TRAVERSE.push(`${idx.r},${idx.c}`);
         this.intervalAnimation = setInterval(this.animationFinishColOrRowOrSquareSudoku.bind(this), 100);
     }
 

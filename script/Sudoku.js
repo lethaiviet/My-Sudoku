@@ -244,9 +244,9 @@ export default class Sudoku {
 
     checkValidAllSubGrids(grid) {
         for (let i = 0; i < Sudoku.SIZE; i++) {
-            let subGrid = getSubGridAt(
-                Math.floor(i / this.SUB_GRID_SIZE),
-                i % this.SUB_GRID_SIZE,
+            let subGrid = this.getSubGridAt(
+                Math.floor(i / Sudoku.SUB_GRID_SIZE),
+                i % Sudoku.SUB_GRID_SIZE,
                 grid);
             if (!this.checkValidArray(subGrid)) return false;
         }
@@ -388,5 +388,9 @@ export default class Sudoku {
     isAtSameSubGrid(idx1, idx2) {
         return Math.floor(idx1.r / Sudoku.SUB_GRID_SIZE) == Math.floor(idx2.r / Sudoku.SUB_GRID_SIZE) &&
             Math.floor(idx1.c / Sudoku.SUB_GRID_SIZE) == Math.floor(idx2.c / Sudoku.SUB_GRID_SIZE);
+    }
+
+    isCompleted() {
+        return this.STATE.isCompletedEntireGrid;
     }
 }

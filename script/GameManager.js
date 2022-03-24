@@ -201,10 +201,12 @@ window.onload = () => {
     }
 
     const handleClickOnSudokuGrid = (event) => {
+        if (SUDOKU.isCompleted()) return;
         const pos = {
             "x": event.clientX - CANVAS.offsetLeft,
             "y": event.clientY - CANVAS.offsetTop
         };
+
         SUDOKU_GRAPHIC.fillColorSelectedAreaByPosition(pos);
     }
 
