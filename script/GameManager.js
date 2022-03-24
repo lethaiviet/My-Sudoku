@@ -74,7 +74,7 @@ window.onload = () => {
                 state = {...state,
                     ...curr
                 };
-                if (state.typeEvent == "click-on-toggle") {
+                if (!SUDOKU.isCompleted() && state.typeEvent == "click-on-toggle") {
                     state.count = !state.count;
                     state.count ? SUDOKU_GRAPHIC.drawPlayScreen() : SUDOKU_GRAPHIC.drawPauseScreen();
                 } else {
@@ -219,7 +219,7 @@ window.onload = () => {
     const fromClickToMap = (id, obj) => fromClick(id).pipe(mapTo(obj));
 
     const setValueWatchStop = (value) => {
-        document.querySelector("#timer").innerHTML = Utils.formatSeconds(value);
+        SUDOKU.isCompleted() || (document.querySelector("#timer").innerHTML = Utils.formatSeconds(value));
     }
 
     const setIconPlayPauseBtn = (isCounting) => {

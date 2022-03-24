@@ -341,7 +341,7 @@ export default class Sudoku {
     }
 
     revertToPrevData() {
-        if (this.BLOCK_STACK.length == 0) return;
+        if (this.BLOCK_STACK.length == 0 || this.isCompleted()) return;
 
         const prevData = this.BLOCK_STACK.pop();
         this.FILLED_GRID = prevData.FILLED_GRID;
