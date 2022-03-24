@@ -15,7 +15,8 @@ const {
     startWith,
     switchMap,
     tap,
-    throttleTime
+    throttleTime,
+    filter,
 } = rxjs.operators;
 
 window.onload = () => {
@@ -166,6 +167,7 @@ window.onload = () => {
         );
 
         const numpad$ = event$.pipe(
+            filter(() => !SUDOKU.isCompleted()),
             throttleTime(200),
             tap((state) => SUDOKU_GRAPHIC.changeBlockValueAndDraw(state.value))
         )
@@ -182,8 +184,13 @@ window.onload = () => {
             SUDOKU_GRAPHIC.enablePencilMode(state);
         });
 
-        fromClick("undo-btn").subscribe(() => SUDOKU_GRAPHIC.undoAndDraw());
-        fromClick("hint-btn").subscribe(() => SUDOKU_GRAPHIC.useHintAndDraw());
+        fromClick("undo-btn").pipe(
+            filter(() => !SUDOKU.isCompleted())
+        ).subscribe(() => SUDOKU_GRAPHIC.undoAndDraw());
+
+        fromClick("hint-btn").pipe(
+            filter(() => !SUDOKU.isCompleted())
+        ).subscribe(() => SUDOKU_GRAPHIC.useHintAndDraw());
     }
 
     const initToggleAutoCheckMistake = () => {
