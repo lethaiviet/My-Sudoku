@@ -15,10 +15,20 @@ export default class Sudoku {
         this.WRONG_GRID = [];
         this.BLOCK_STACK = [];
         this.ANSWER_GRID = [];
+        this.initState();
         this.generateLevelSudoku(level);
         this.createZeroGrid(this.FILLED_GRID);
         this.createZeroGrid(this.WRONG_GRID);
         this.createEmptyGrid(this.PENCIL_GRID);
+    }
+
+    initState() {
+        this.STATE = {
+            isCompletedRow: false,
+            isCompletedCol: false,
+            isCompletedSubGrid: false,
+            isCompletedEntireGrid: false,
+        };
     }
 
     createZeroGrid(grid = this.GRID) {
@@ -165,6 +175,7 @@ export default class Sudoku {
         this.PENCIL_GRID[idx.r][idx.c] = [];
         this.updateWrongGridByAllFilledBlocks();
         this.correctPencilBlockByFilledBlock(idx, value);
+        this.updateStateSudoku(idx);
     }
 
     changePencilBlockValueByIdx(idx, value) {
@@ -219,17 +230,67 @@ export default class Sudoku {
         }
     }
 
-    checkColsAndRowsSudoku() {
-        const grid = Utils.mergeMatrix(this.GRID, this.FILLED_GRID);
-        for (let i = 0; i < 9; i++) {
+    checkValidAllColsAndAllRows(grid) {
+        for (let i = 0; i < Sudoku.SIZE; i++) {
             let row = grid[i];
             let col = grid.map(val => val[i]);
 
-            if (checkDuplicatedValueInArray(row) ||
-                checkDuplicatedValueInArray(col))
+            if (!this.checkValidArray(row) ||
+                !this.checkValidArray(col))
                 return false;
         }
         return true;
+    }
+
+    checkValidAllSubGrids(grid) {
+        for (let i = 0; i < Sudoku.SIZE; i++) {
+            let subGrid = getSubGridAt(
+                Math.floor(i / this.SUB_GRID_SIZE),
+                i % this.SUB_GRID_SIZE,
+                grid);
+            if (!this.checkValidArray(subGrid)) return false;
+        }
+        return true;
+    }
+
+    checkValidEntireGrid(grid) {
+        return this.checkValidAllColsAndAllRows(grid) &&
+            this.checkValidAllSubGrids(grid);
+    }
+
+    checkValidRowAt(grid, idx) {
+        return this.checkValidArray(grid[idx.r]);
+    }
+
+    checkValidColAt(grid, idx) {
+        let col = grid.map(function(val) {
+            return val[idx.c];
+        });
+        return this.checkValidArray(col);
+    }
+
+    checkValidSubGrid(grid, idx) {
+        let subGrid = this.getSubGridAt(
+            Math.floor(idx.c / Sudoku.SUB_GRID_SIZE),
+            Math.floor(idx.r / Sudoku.SUB_GRID_SIZE),
+            grid);
+        console.table(subGrid)
+        return this.checkValidArray(subGrid);
+    }
+
+    getStateGridAt(idx) {
+        let grid = this.getSolvedGrid();
+        return {
+            isCompletedRow: this.checkValidRowAt(grid, idx),
+            isCompletedCol: this.checkValidColAt(grid, idx),
+            isCompletedSubGrid: this.checkValidSubGrid(grid, idx),
+            isCompletedEntireGrid: this.checkValidEntireGrid(grid),
+        };
+    }
+
+    checkValidArray(arr) {
+        if (arr.includes(0)) return false;
+        return !Utils.checkDuplicatedValueInArray(arr);
     }
 
     getAllInvalidBlocksByFilledBlock(idx, value) {
@@ -287,6 +348,7 @@ export default class Sudoku {
         this.FILLED_GRID = prevData.FILLED_GRID;
         this.PENCIL_GRID = prevData.PENCIL_GRID;
         this.updateWrongGridByAllFilledBlocks();
+        this.initState();
     }
 
     useHintAt(idx) {
@@ -297,5 +359,34 @@ export default class Sudoku {
         this.updateWrongGridByAllFilledBlocks();
         this.correctPencilBlockByFilledBlock(idx, value);
         this.resetBackupData();
+    }
+
+    updateStateSudoku(idx) {
+        this.STATE = this.getStateGridAt(idx);
+    }
+
+    getStateSudoku() {
+        return this.STATE;
+    }
+
+    hasAnyColsOrRowsOrSubGridCompletedAt(idx) {
+        if (idx.r < 0 || idx.c < 0 || this.GRID[idx.r][idx.c] != 0) return false;
+        return this.STATE.isCompletedCol ||
+            this.STATE.isCompletedRow ||
+            this.STATE.isCompletedSubGrid ||
+            this.STATE.isCompletedEntireGrid;
+    }
+
+    isAtSameRow(idx1, idx2) {
+        return idx1.r == idx2.r;
+    }
+
+    isAtSameCol(idx1, idx2) {
+        return idx1.c == idx2.c;
+    }
+
+    isAtSameSubGrid(idx1, idx2) {
+        return Math.floor(idx1.r / Sudoku.SUB_GRID_SIZE) == Math.floor(idx2.r / Sudoku.SUB_GRID_SIZE) &&
+            Math.floor(idx1.c / Sudoku.SUB_GRID_SIZE) == Math.floor(idx2.c / Sudoku.SUB_GRID_SIZE);
     }
 }

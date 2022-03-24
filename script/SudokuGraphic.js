@@ -12,6 +12,7 @@ export default class SudokuGraphic {
     static TEXT_SIZE = SudokuGraphic.BLOCK_SIZE * 0.7;
     static PADDING = 10;
     static SELECTED_BLOCK_ID = Utils.creatIdxObj(-1, -1);
+    static COLORS_LIST = ["#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA", "#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA", "#D8E4EF", "#C3D4E5", "#B2C6DD", "#ACC1DA"];
 
     static STYLE = {
         thinLine: 'gray',
@@ -39,6 +40,9 @@ export default class SudokuGraphic {
         //MAP_BLOCK contains all the vertices of block
         //Ex: MAP_BLOCK[0][0].topLeft.x is the x coordinate top left of the block at (0,0)
         this.MAP_BLOCK = [];
+        this.MAP_IDX_COLOR = {};
+        this.LIST_IDX_TRAVERSE = [];
+        this.intervalAnimation;
         this.initMapBlock();
     }
 
@@ -218,6 +222,10 @@ export default class SudokuGraphic {
     changeBlockValueAndDraw(value) {
         this.sudoku.changeBlockValueByIdx(SudokuGraphic.SELECTED_BLOCK_ID, value, this.isPencilMode);
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
+        this.stopAnimation();
+        if (this.sudoku.hasAnyColsOrRowsOrSubGridCompletedAt(SudokuGraphic.SELECTED_BLOCK_ID)) {
+            this.initAnimation(SudokuGraphic.SELECTED_BLOCK_ID);
+        }
     }
 
     undoAndDraw() {
@@ -228,6 +236,65 @@ export default class SudokuGraphic {
     useHintAndDraw() {
         this.sudoku.useHintAt(SudokuGraphic.SELECTED_BLOCK_ID);
         this.fillColorSelectedAreaByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
+    }
+
+    isIdxWithAnimation(idx) {
+        const state = this.sudoku.getStateSudoku();
+        const isAtRowWithAnim = (state.isCompletedRow && this.sudoku.isAtSameRow(idx, SudokuGraphic.SELECTED_BLOCK_ID));
+        const isAtColWithAnim = (state.isCompletedCol && this.sudoku.isAtSameCol(idx, SudokuGraphic.SELECTED_BLOCK_ID));
+        const isAtGridWithAnim = (state.isCompletedSubGrid && this.sudoku.isAtSameSubGrid(idx, SudokuGraphic.SELECTED_BLOCK_ID));
+        return isAtColWithAnim || isAtRowWithAnim || isAtGridWithAnim;
+    }
+
+    animationFinishColOrRowOrSquareSudoku() {
+        this.clearEntireSudoku();
+        this.fillColorBlocksInRowAndColByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
+        this.fillColorBlocksInSubGridByIdx(SudokuGraphic.SELECTED_BLOCK_ID);
+        this.fillColorBlockByValue(SudokuGraphic.SELECTED_BLOCK_ID);
+        this.fillColorWrongBlocks();
+        this.fillColorBlockByIdx(SudokuGraphic.SELECTED_BLOCK_ID, SudokuGraphic.STYLE.selectedBlock);
+
+        if (Object.keys(this.MAP_IDX_COLOR).length == 0) {
+            this.stopAnimation();
+        } else {
+            for (const [idxStr, idxColor] of Object.entries(this.MAP_IDX_COLOR)) {
+                const idxObj = Utils.convertStrToIdxObj(idxStr);
+
+                if (this.MAP_IDX_COLOR[idxStr] <= 0 || !this.isIdxWithAnimation(idxObj)) {
+                    delete this.MAP_IDX_COLOR[idxStr];
+                    continue;
+                }
+
+                this.fillColorBlockByIdx(idxObj, SudokuGraphic.COLORS_LIST[idxColor]);
+                this.MAP_IDX_COLOR[idxStr] = idxColor - 1;
+
+                const neighbors = this.getListNeighborsIdxAt(idxObj);
+                for (const neighbor of neighbors) {
+                    if (this.LIST_IDX_TRAVERSE.includes(neighbor.toString())) continue;
+                    this.LIST_IDX_TRAVERSE.push(neighbor.toString());
+                    this.MAP_IDX_COLOR[neighbor] = idxColor + 1;
+                }
+            }
+        }
+        this.drawGridSudoku();
+        this.drawNumberIntoGrid();
+        this.drawNumberIntoGridWithCheckingMistakes();
+        this.drawPencilGrid();
+    }
+
+    initAnimation(idx = SudokuGraphic.SELECTED_BLOCK_ID) {
+        this.MAP_IDX_COLOR[[idx.r, idx.c]] = SudokuGraphic.COLORS_LIST.length - 1;
+        this.LIST_IDX_TRAVERSE = [];
+        this.LIST_IDX_TRAVERSE.push([
+            [idx.r, idx.c]
+        ].toString());
+        this.intervalAnimation = setInterval(this.animationFinishColOrRowOrSquareSudoku.bind(this), 80);
+    }
+
+    stopAnimation() {
+        clearInterval(this.intervalAnimation);
+        this.LIST_IDX_TRAVERSE = [];
+        this.MAP_IDX_COLOR = {};
     }
 
     fillColorSelectedAreaByIdx(idx = SudokuGraphic.SELECTED_BLOCK_ID) {
@@ -348,5 +415,21 @@ export default class SudokuGraphic {
 
     enablePencilMode(enable) {
         this.isPencilMode = enable;
+    }
+
+    getListNeighborsIdxAt(idx) {
+        let list = [];
+        for (const direction of Object.values(Direction)) {
+            let neighbor = [idx.r + direction.vector[0], idx.c + direction.vector[1]];
+
+            if (neighbor[0] < 0 ||
+                neighbor[1] < 0 ||
+                neighbor[0] >= Sudoku.SIZE ||
+                neighbor[1] >= Sudoku.SIZE)
+                continue;
+            list.push(neighbor);
+        }
+
+        return list;
     }
 }
