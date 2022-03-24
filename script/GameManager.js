@@ -190,7 +190,10 @@ window.onload = () => {
 
         fromClick("hint-btn").pipe(
             filter(() => !SUDOKU.isCompleted())
-        ).subscribe(() => SUDOKU_GRAPHIC.useHintAndDraw());
+        ).subscribe(() => {
+            SUDOKU_GRAPHIC.useHintAndDraw();
+            updateHintText();
+        });
     }
 
     const initToggleAutoCheckMistake = () => {
@@ -204,6 +207,7 @@ window.onload = () => {
         SUDOKU = new Sudoku(level);
         SUDOKU_GRAPHIC = new SudokuGraphic(CANVAS, SUDOKU);
         SUDOKU_GRAPHIC.drawPlayScreen();
+        updateHintText();
     }
 
     const handleClickOnSudokuGrid = (event) => {
@@ -232,6 +236,10 @@ window.onload = () => {
     const setIconPlayPauseBtn = (isCounting) => {
         const attribute = isCounting ? "fa fa-pause" : "fa fa-play";
         PLAY_PAUSE_BTN.querySelector("i").setAttribute("class", attribute);
+    }
+
+    const updateHintText = () => {
+        document.querySelector('#hint-txt').innerHTML = `Hint: ${SUDOKU.getNumbHints()}`;
     }
 
     WebFont.load({

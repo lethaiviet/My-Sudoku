@@ -15,6 +15,7 @@ export default class Sudoku {
         this.WRONG_GRID = [];
         this.BLOCK_STACK = [];
         this.ANSWER_GRID = [];
+        this.NUMBS_HINT = 5;
         this.initState();
         this.generateLevelSudoku(level);
         this.createZeroGrid(this.FILLED_GRID);
@@ -350,6 +351,9 @@ export default class Sudoku {
     }
 
     useHintAt(idx) {
+        if (this.NUMBS_HINT <= 0 || this.GRID[idx.r][idx.c] != 0) return;
+
+        this.NUMBS_HINT--;
         const value = this.ANSWER_GRID[idx.r][idx.c];
         this.GRID[idx.r][idx.c] = value;
         this.FILLED_GRID[idx.r][idx.c] = 0;
@@ -390,5 +394,9 @@ export default class Sudoku {
 
     isCompleted() {
         return this.STATE.isCompletedEntireGrid;
+    }
+
+    getNumbHints() {
+        return this.NUMBS_HINT;
     }
 }
