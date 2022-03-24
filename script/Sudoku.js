@@ -100,7 +100,6 @@ export default class Sudoku {
 
             this.COUNT = 0;
             this.solveSudoku(gridCopy);
-
             if (this.COUNT != 1) {
                 this.GRID[row][col] = backup;
                 level--;
@@ -168,12 +167,12 @@ export default class Sudoku {
         if (idx.r < 0 || idx.c < 0 || this.GRID[idx.r][idx.c] != 0) return;
         this.backupData();
         isPencilMode ? this.changePencilBlockValueByIdx(idx, value) : this.changeFilledBlockValueByIdx(idx, value);
+        this.updateWrongGridByAllFilledBlocks();
     }
 
     changeFilledBlockValueByIdx(idx, value) {
         this.FILLED_GRID[idx.r][idx.c] = this.FILLED_GRID[idx.r][idx.c] == value ? 0 : value;
         this.PENCIL_GRID[idx.r][idx.c] = [];
-        this.updateWrongGridByAllFilledBlocks();
         this.correctPencilBlockByFilledBlock(idx, value);
         this.updateStateSudoku(idx);
     }
